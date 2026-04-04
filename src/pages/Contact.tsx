@@ -96,9 +96,10 @@ const Contact = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             _subject: `New Contact Message: ${subject}`,
+            _replyto: email || undefined,
             name: full_name,
             phone,
-            email: email || "Not provided",
+            "sender email": email || "Not provided",
             subject,
             message,
           }),
