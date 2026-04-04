@@ -143,6 +143,29 @@ const BookAppointment = () => {
 
       if (appointmentError) throw appointmentError;
 
+      // Send email notification via Formspree
+      const selectedServiceData2 = services.find(s => s.id === selectedService);
+      const selectedDoctorData = doctors.find(d => d.id === selectedDoctor);
+      try {
+        await fetch("https://formspree.io/f/mzdkgvok", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            _subject: `New Appointment Booking: ${patientInfo.name}`,
+            patient_name: patientInfo.name,
+            phone: patientInfo.phone,
+            email: patientInfo.email || "Not provided",
+            service: selectedServiceData2?.name || selectedService,
+            doctor: selectedDoctorData?.name || "No preference",
+            date: selectedDate,
+            time: selectedTime,
+            notes: patientInfo.notes || "None",
+          }),
+        });
+      } catch {
+        // Notification failure shouldn't block the user
+      }
+
       toast({
         title: "Appointment Booked!✔✔",
         description: "We'll send you a confirmation shortly.",
