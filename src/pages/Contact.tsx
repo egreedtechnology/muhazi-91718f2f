@@ -89,6 +89,24 @@ const Contact = () => {
         variant: "destructive",
       });
     } else {
+      // Send email notification via Formspree
+      try {
+        await fetch("https://formspree.io/f/mzdkgvok", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            _subject: `New Contact Message: ${subject}`,
+            name: full_name,
+            phone,
+            email: email || "Not provided",
+            subject,
+            message,
+          }),
+        });
+      } catch {
+        // Notification failure shouldn't block the user
+      }
+
       toast({
         title: "Message Sent!",
         description: "We'll get back to you as soon as possible.",
