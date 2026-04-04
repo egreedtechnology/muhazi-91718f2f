@@ -152,9 +152,10 @@ const BookAppointment = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             _subject: `New Appointment Booking: ${patientInfo.name}`,
+            _replyto: patientInfo.email || undefined,
             patient_name: patientInfo.name,
             phone: patientInfo.phone,
-            email: patientInfo.email || "Not provided",
+            "patient email": patientInfo.email || "Not provided",
             service: selectedServiceData2?.name || selectedService,
             doctor: selectedDoctorData?.name || "No preference",
             date: selectedDate,
