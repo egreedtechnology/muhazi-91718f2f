@@ -93,57 +93,34 @@ const BookAppointment = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     try {
-      // First, create or find the patient
-      const { data: existingPatient, error: findError } = await supabase
-        .from("patients")
-        .select("id")
-        .eq("phone", patientInfo.phone)
-        .maybeSingle();
+      const selectedServiceData = services.find((s) => s.id === selectedService);
+      const durationMinutes = selectedServiceData?.duration
+        ? parseInt(selectedServiceData.duration)
+        : 30;
 
-      let patientId: string;
-
-      if (existingPatient) {
-        patientId = existingPatient.id;
-      } else {
-        // Create new patient record
-        const { data: newPatient, error: createPatientError } = await supabase
-          .from("patients")
-          .insert({
+      // Securely create patient + appointment via edge function (service role)
+      const { data: result, error: bookingError } = await supabase.functions.invoke(
+        "public-booking",
+        {
+          body: {
             full_name: patientInfo.name,
             phone: patientInfo.phone,
             email: patientInfo.email || null,
-          })
-          .select("id")
-          .single();
+            notes: patientInfo.notes || null,
+            appointment_date: selectedDate,
+            appointment_time: selectedTime,
+            duration_minutes: durationMinutes,
+          },
+        }
+      );
 
-        if (createPatientError) throw createPatientError;
-        patientId = newPatient.id;
-      }
-
-      // Get service details for duration
-      const selectedServiceData = services.find(s => s.id === selectedService);
-      const durationMinutes = selectedServiceData?.duration ? 
-        parseInt(selectedServiceData.duration) : 30;
-
-      // Create the appointment
-      const { error: appointmentError } = await supabase
-        .from("appointments")
-        .insert({
-          patient_id: patientId,
-          appointment_date: selectedDate,
-          appointment_time: selectedTime,
-          notes: patientInfo.notes || null,
-          status: "pending",
-          duration_minutes: durationMinutes,
-        });
-
-      if (appointmentError) throw appointmentError;
+      if (bookingError) throw bookingError;
+      if (result?.error) throw new Error(result.error);
 
       // Send email notification via Formspree
-      const selectedServiceData2 = services.find(s => s.id === selectedService);
-      const selectedDoctorData = doctors.find(d => d.id === selectedDoctor);
+      const selectedDoctorData = doctors.find((d) => d.id === selectedDoctor);
       try {
         await fetch("https://formspree.io/f/mzdkgvok", {
           method: "POST",
@@ -154,7 +131,7 @@ const BookAppointment = () => {
             patient_name: patientInfo.name,
             phone: patientInfo.phone,
             "patient email": patientInfo.email || "Not provided",
-            service: selectedServiceData2?.name || selectedService,
+            service: selectedServiceData?.name || selectedService,
             doctor: selectedDoctorData?.name || "No preference",
             date: selectedDate,
             time: selectedTime,
@@ -169,7 +146,7 @@ const BookAppointment = () => {
         title: "Appointment Booked!✔✔",
         description: "We'll send you a confirmation shortly.",
       });
-      
+
       setStep(5); // Success step
     } catch (error: any) {
       console.error("Booking error:", error);
