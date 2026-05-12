@@ -64,20 +64,18 @@ const BookAppointment = () => {
     setLoadingSlots(true);
     setSelectedTime("");
     try {
-      const { data, error } = await supabase
-        .from("appointments")
-        .select("appointment_time, duration_minutes")
-        .eq("appointment_date", date)
-        .neq("status", "cancelled");
+      const { data, error } = await supabase.functions.invoke("check-availability", {
+        body: { date },
+      });
 
       if (error) throw error;
 
       // Build list of occupied time slots
       const occupied: string[] = [];
-      (data || []).forEach((appt) => {
-        const [h, m] = appt.appointment_time.split(":").map(Number);
+      ((data?.slots ?? []) as Array<{ time: string; duration: number }>).forEach((appt) => {
+        const [h, m] = appt.time.split(":").map(Number);
         const startMin = h * 60 + m;
-        const dur = appt.duration_minutes || 30;
+        const dur = appt.duration || 30;
         // Mark every 30-min slot that overlaps this appointment
         for (let t = startMin; t < startMin + dur; t += 30) {
           const hh = String(Math.floor(t / 60)).padStart(2, "0");
