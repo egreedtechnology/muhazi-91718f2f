@@ -65,45 +65,9 @@ const PatientRegister = () => {
       return;
     }
 
-    // Create or find patient record and link it
-    if (authData.user) {
-      // First check if patient exists with this email or phone
-      const { data: existingPatient } = await supabase
-        .from("patients")
-        .select("id")
-        .or(`email.eq.${email},phone.eq.${phone}`)
-        .maybeSingle();
-
-      let patientId = existingPatient?.id;
-
-      // If no existing patient, create one
-      if (!patientId) {
-        const { data: newPatient, error: patientError } = await supabase
-          .from("patients")
-          .insert({
-            full_name: fullName,
-            email: email,
-            phone: phone,
-          })
-          .select("id")
-          .single();
-
-        if (patientError) {
-          console.error("Error creating patient:", patientError);
-        } else {
-          patientId = newPatient.id;
-        }
-      }
-
-      // Link patient account
-      if (patientId) {
-        await supabase.from("patient_accounts").insert({
-          user_id: authData.user.id,
-          patient_id: patientId,
-          is_verified: false,
-        });
-      }
-    }
+    // Account is created. Patient record linking is performed by clinic staff
+    // after identity verification to prevent unauthorized access to existing
+    // patient records via guessed phone/email matches.
 
     toast({
       title: "Registration successful!",
