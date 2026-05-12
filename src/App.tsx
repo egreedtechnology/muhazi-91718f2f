@@ -26,6 +26,10 @@ import Patients from "./pages/admin/Patients";
 import Services from "./pages/admin/Services";
 import Settings from "./pages/admin/Settings";
 import Messages from "./pages/admin/Messages";
+import BlogManagement from "./pages/admin/BlogManagement";
+import AnnouncementsManagement from "./pages/admin/AnnouncementsManagement";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
@@ -48,6 +52,8 @@ const App = () => (
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/book" element={<BookAppointment />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             
@@ -130,7 +136,23 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
-            
+            <Route
+              path="/admin/blog"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin"]}>
+                  <BlogManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/announcements"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin"]}>
+                  <AnnouncementsManagement />
+                </ProtectedRoute>
+              }
+            />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -11,6 +11,8 @@ import {
   LogOut,
   Menu,
   MessageSquare,
+  FileText,
+  Megaphone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,6 +26,8 @@ const menuItems = [
   { icon: UserCircle, label: "Staff", path: "/admin/staff", roles: ["super_admin"] },
   { icon: Stethoscope, label: "Services", path: "/admin/services", roles: ["super_admin"] },
   { icon: BarChart3, label: "Gallery", path: "/admin/gallery", roles: ["super_admin"] },
+  { icon: FileText, label: "Blog", path: "/admin/blog", roles: ["super_admin"] },
+  { icon: Megaphone, label: "Announcements", path: "/admin/announcements", roles: ["super_admin"] },
   { icon: Settings, label: "Settings", path: "/admin/settings", roles: ["super_admin"] },
 ];
 
