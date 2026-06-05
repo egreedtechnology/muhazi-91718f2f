@@ -15,7 +15,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        heading: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        heading: ['Space Grotesk', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
