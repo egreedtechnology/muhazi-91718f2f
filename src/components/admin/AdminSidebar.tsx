@@ -16,6 +16,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Activity,
+  LayoutGrid,
+  ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
     label: "Workspace",
     items: [
       { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard", roles: ["super_admin", "receptionist", "dentist", "accountant"] },
+      { icon: LayoutGrid, label: "Triage board", path: "/admin/triage", roles: ["super_admin", "receptionist", "dentist"] },
       { icon: CalendarDays, label: "Calendar", path: "/admin/calendar", roles: ["super_admin", "receptionist", "dentist"] },
       { icon: Calendar, label: "Appointments", path: "/admin/appointments", roles: ["super_admin", "receptionist", "dentist"] },
     ],
@@ -36,7 +39,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
     label: "People",
     items: [
       { icon: Users, label: "Patients", path: "/admin/patients", roles: ["super_admin", "receptionist", "dentist"] },
-      { icon: MessageSquare, label: "Messages", path: "/admin/messages", roles: ["super_admin", "receptionist"] },
+      { icon: MessageSquare, label: "Inbox", path: "/admin/messages", roles: ["super_admin", "receptionist"] },
       { icon: UserCircle, label: "Staff", path: "/admin/staff", roles: ["super_admin"] },
     ],
   },
@@ -51,7 +54,10 @@ const sections: { label: string; items: { icon: any; label: string; path: string
   },
   {
     label: "System",
-    items: [{ icon: Settings, label: "Settings", path: "/admin/settings", roles: ["super_admin"] }],
+    items: [
+      { icon: ShieldCheck, label: "Audit log", path: "/admin/audit-logs", roles: ["super_admin"] },
+      { icon: Settings, label: "Settings", path: "/admin/settings", roles: ["super_admin"] },
+    ],
   },
 ];
 

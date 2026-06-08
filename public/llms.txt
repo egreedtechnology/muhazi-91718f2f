@@ -1,0 +1,21 @@
+# Muhazi Dental Clinic
+
+> Trusted dental clinic in Rwamagana, Rwanda — open 7 days a week for cleanings, fillings, root canals, whitening, extractions and implants.
+
+Muhazi Dental Clinic is a modern, clinical-only dental practice located on the 2nd floor above the MTN Branch in Rwamagana, Eastern Province, Rwanda. The site lets patients learn about services, meet the team, read dental health content, and book or request appointments online.
+
+## Pages
+
+- [Home](/): Overview of the clinic, services, hours and contact.
+- [About](/about): Mission, history, and team values.
+- [Services](/services): Full list of dental treatments offered.
+- [Doctors](/doctors): Profiles of dentists and clinical staff.
+- [Gallery](/gallery): Photos of the clinic and treatments.
+- [Contact](/contact): Phone, WhatsApp, email and directions.
+- [Book Appointment](/book): Online appointment request form.
+- [Blog](/blog): Articles on dental hygiene and oral health.
+
+## Optional
+
+- [Privacy Policy](/privacy): How patient data is handled.
+- [Terms of Service](/terms): Terms for using the website.
