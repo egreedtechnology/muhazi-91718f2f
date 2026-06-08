@@ -28,6 +28,8 @@ import Settings from "./pages/admin/Settings";
 import Messages from "./pages/admin/Messages";
 import BlogManagement from "./pages/admin/BlogManagement";
 import AnnouncementsManagement from "./pages/admin/AnnouncementsManagement";
+import Triage from "./pages/admin/Triage";
+import AuditLogs from "./pages/admin/AuditLogs";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -149,6 +151,22 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["super_admin"]}>
                   <AnnouncementsManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/triage"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin", "receptionist", "dentist"]}>
+                  <Triage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/audit-logs"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin"]}>
+                  <AuditLogs />
                 </ProtectedRoute>
               }
             />
