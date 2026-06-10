@@ -184,7 +184,7 @@ const Index = () => {
           >
             <img 
               src={slide.image} 
-              alt={`Slide ${index + 1}`}
+              alt={slide.alt}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-foreground/40" />
