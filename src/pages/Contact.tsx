@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SEOHead from "@/components/seo/SEOHead";
+import StructuredData from "@/components/seo/StructuredData";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,10 +122,93 @@ const Contact = () => {
   return (
     <PublicLayout>
       <SEOHead 
-        title="Contact Us | Muhazi Dental Clinic"
-        description="Contact Muhazi Dental Clinic in Rwamagana, Rwanda. Call +250 787 630 399 or visit us at 2nd Floor, Above MTN Branch. Open Monday-Sunday 8AM-8PM."
+        title="Contact Muhazi Dental Clinic — Rwamagana, Rwanda"
+        description="Call +250 787 630 399, WhatsApp, or visit us at 2nd Floor above MTN Branch in Rwamagana. Open 7 days, 8AM–8PM. Email info@muhazidentalclinic.org."
         canonical="/contact"
-        keywords="contact Muhazi Dental, Rwamagana dentist contact, dental clinic phone, clinic location Rwanda"
+        keywords="contact Muhazi Dental, Rwamagana dentist contact, dental clinic phone Rwanda, clinic location Rwamagana, WhatsApp dentist, eGreed Technology"
+        ogImageAlt="Contact Muhazi Dental Clinic in Rwamagana, Rwanda"
+      />
+      <StructuredData
+        id="ld-contact-page"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          name: "Contact Muhazi Dental Clinic",
+          url: "https://muhazidentalclinic.org/contact",
+          inLanguage: "en-RW",
+          isPartOf: { "@type": "WebSite", url: "https://muhazidentalclinic.org" },
+          creator: {
+            "@type": "Organization",
+            name: "eGreed Technology",
+            url: "https://egreedtech.org",
+          },
+        }}
+      />
+      <StructuredData
+        id="ld-contact-localbusiness"
+        data={{
+          "@context": "https://schema.org",
+          "@type": ["Dentist", "LocalBusiness", "MedicalBusiness"],
+          name: "Muhazi Dental Clinic",
+          image: "https://muhazidentalclinic.org/mdc-logo.jpg",
+          logo: "https://muhazidentalclinic.org/mdc-logo.jpg",
+          url: "https://muhazidentalclinic.org",
+          telephone: "+250787630399",
+          email: "info@muhazidentalclinic.org",
+          priceRange: "$$",
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: "2nd Floor, Above MTN Branch",
+            addressLocality: "Rwamagana",
+            addressRegion: "Eastern Province",
+            addressCountry: "RW",
+          },
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: -1.9486,
+            longitude: 30.4347,
+          },
+          hasMap: "https://maps.google.com/?q=Muhazi+Dental+Clinic+Rwamagana",
+          openingHoursSpecification: [
+            {
+              "@type": "OpeningHoursSpecification",
+              dayOfWeek: [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+              ],
+              opens: "08:00",
+              closes: "20:00",
+            },
+          ],
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              telephone: "+250787630399",
+              contactType: "Reservations",
+              areaServed: "RW",
+              availableLanguage: ["English", "Kinyarwanda", "French"],
+              contactOption: ["TollFree", "HearingImpairedSupported"],
+            },
+            {
+              "@type": "ContactPoint",
+              telephone: "+250787630399",
+              contactType: "Customer Support",
+              areaServed: "RW",
+              availableLanguage: ["English", "Kinyarwanda", "French"],
+            },
+          ],
+          sameAs: [
+            "https://www.facebook.com/muhazidc",
+            "https://www.instagram.com/muhazi_dental",
+            "https://www.tiktok.com/@muhazidc",
+            "https://x.com/muhazidc",
+          ],
+        }}
       />
       {/* Hero Section */}
       <section className="section-padding bg-gradient-to-b from-muted to-background">

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SEOHead from "@/components/seo/SEOHead";
+import StructuredData from "@/components/seo/StructuredData";
 import BookingGuide from "@/components/booking/BookingGuide";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,10 +181,92 @@ const BookAppointment = () => {
   return (
     <PublicLayout>
       <SEOHead 
-        title="Book Appointment | Muhazi Dental Clinic"
-        description="Book your dental appointment online at Muhazi Dental Clinic, Rwamagana. Choose from our services including checkups, cleaning, whitening, and more."
+        title="Book a Dental Appointment Online | Muhazi Dental Clinic"
+        description="Reserve your visit online in minutes. Cleanings, fillings, root canal, whitening, extractions and implants in Rwamagana — open 7 days, 8AM–8PM."
         canonical="/book"
-        keywords="book dental appointment, online booking, Rwamagana dentist appointment, schedule dental visit, dental booking Rwanda"
+        keywords="book dental appointment, online dental booking, Rwamagana dentist, schedule dental visit, dental booking Rwanda, Muhazi Dental Clinic, eGreed Technology"
+        ogImageAlt="Book your dental appointment at Muhazi Dental Clinic, Rwamagana"
+      />
+      <StructuredData
+        id="ld-book-reserveaction"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ReserveAction",
+          name: "Book a Dental Appointment",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: "https://muhazidentalclinic.org/book",
+            inLanguage: ["en-RW", "rw-RW", "fr-RW"],
+            actionPlatform: [
+              "http://schema.org/DesktopWebPlatform",
+              "http://schema.org/MobileWebPlatform",
+            ],
+          },
+          result: {
+            "@type": "Reservation",
+            name: "Dental Appointment",
+            provider: {
+              "@type": "Dentist",
+              name: "Muhazi Dental Clinic",
+              url: "https://muhazidentalclinic.org",
+              telephone: "+250787630399",
+            },
+          },
+        }}
+      />
+      <StructuredData
+        id="ld-book-faq"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            {
+              "@type": "Question",
+              name: "How do I book a dental appointment online?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Pick a service, preferred dentist, date and time, then enter your contact details. You'll receive a confirmation by email or WhatsApp.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Can I reschedule or cancel my booking?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "Yes. Reply to your confirmation message or call +250 787 630 399 and we will reschedule or cancel for you at no charge.",
+              },
+            },
+            {
+              "@type": "Question",
+              name: "Do I need to create an account to book?",
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: "No account is required for a single booking. Returning patients can register for the patient portal to view history and upcoming visits.",
+              },
+            },
+          ],
+        }}
+      />
+      <StructuredData
+        id="ld-book-webpage"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "Book a Dental Appointment",
+          url: "https://muhazidentalclinic.org/book",
+          isPartOf: { "@type": "WebSite", url: "https://muhazidentalclinic.org" },
+          about: { "@type": "Dentist", name: "Muhazi Dental Clinic" },
+          inLanguage: "en-RW",
+          creator: {
+            "@type": "Organization",
+            name: "eGreed Technology",
+            url: "https://egreedtech.org",
+          },
+          potentialAction: {
+            "@type": "ReserveAction",
+            target: "https://muhazidentalclinic.org/book",
+          },
+        }}
       />
       <BookingGuide />
       {/* Hero */}
