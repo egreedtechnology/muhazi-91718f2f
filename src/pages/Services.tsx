@@ -91,10 +91,80 @@ const Services = () => {
   return (
     <PublicLayout>
       <SEOHead 
-        title="Dental Services | Muhazi Dental Clinic"
-        description="Explore our comprehensive dental services: teeth cleaning, fillings, root canal, whitening, implants, and pediatric dentistry in Rwamagana, Rwanda."
+        title="Dental Services in Rwamagana | Muhazi Dental Clinic"
+        description="Cleanings, fillings, root canal, whitening, implants, crowns, extractions and pediatric dentistry — comprehensive dental care in Rwamagana, Rwanda."
         canonical="/services"
-        keywords="dental services, teeth cleaning, dental fillings, root canal, teeth whitening, dental implants, pediatric dentistry, Rwamagana, Rwanda"
+        keywords="dental services Rwanda, teeth cleaning, dental fillings, root canal Rwamagana, teeth whitening, dental implants, pediatric dentistry, crowns and bridges, eGreed Technology"
+        ogImageAlt="Comprehensive dental services at Muhazi Dental Clinic, Rwamagana"
+      />
+      <StructuredData
+        id="ld-services-itemlist"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Dental Services at Muhazi Dental Clinic",
+          itemListOrder: "https://schema.org/ItemListUnordered",
+          numberOfItems: services.length,
+          itemListElement: services.map((s, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            item: {
+              "@type": "MedicalProcedure",
+              name: s.title,
+              description: s.description,
+              procedureType: "https://schema.org/TherapeuticProcedure",
+              category: s.category,
+              bodyLocation: "Mouth",
+              performer: {
+                "@type": "Dentist",
+                name: "Muhazi Dental Clinic",
+                url: "https://muhazidentalclinic.org",
+              },
+            },
+          })),
+        }}
+      />
+      <StructuredData
+        id="ld-services-offercatalog"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Dentist",
+          name: "Muhazi Dental Clinic",
+          url: "https://muhazidentalclinic.org/services",
+          medicalSpecialty: "Dentistry",
+          hasOfferCatalog: {
+            "@type": "OfferCatalog",
+            name: "Dental Services",
+            itemListElement: services.map((s) => ({
+              "@type": "Offer",
+              itemOffered: {
+                "@type": "MedicalProcedure",
+                name: s.title,
+                description: s.description,
+              },
+              category: s.category,
+              availability: "https://schema.org/InStock",
+              areaServed: { "@type": "Place", name: "Rwamagana, Rwanda" },
+            })),
+          },
+        }}
+      />
+      <StructuredData
+        id="ld-services-webpage"
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "Dental Services",
+          url: "https://muhazidentalclinic.org/services",
+          isPartOf: { "@type": "WebSite", url: "https://muhazidentalclinic.org" },
+          inLanguage: "en-RW",
+          about: { "@type": "MedicalSpecialty", name: "Dentistry" },
+          creator: {
+            "@type": "Organization",
+            name: "eGreed Technology",
+            url: "https://egreedtech.org",
+          },
+        }}
       />
       {/* Hero Section */}
       <section className="section-padding bg-gradient-to-b from-muted to-background">
