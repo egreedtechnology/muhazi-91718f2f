@@ -123,9 +123,10 @@ const Index = () => {
       if (data && data.length > 0) {
         setHeroSlides(data.map((item, i) => ({
           image: item.media_url,
-          title: i === 0 ? "Exellent in Dentist" : "Welcome to",
+          title: i === 0 ? "Excellence in Dentistry" : "Welcome to",
           highlight: i === 0 ? "Your Smile is Our  Priority" : "Muhazi Dental Clinic",
           description: "Experience world-class dental care at Muhazi Dental Clinic with our expert team.",
+          alt: item.caption || item.title || "Muhazi Dental Clinic",
         })));
       }
     };
