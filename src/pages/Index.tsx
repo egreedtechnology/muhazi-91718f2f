@@ -31,6 +31,7 @@ interface HeroSlide {
   title: string;
   highlight: string;
   description: string;
+  alt: string;
 }
 
 const defaultHeroSlides: (HeroSlide & { alt: string })[] = [
