@@ -33,24 +33,27 @@ interface HeroSlide {
   description: string;
 }
 
-const defaultHeroSlides: HeroSlide[] = [
+const defaultHeroSlides: (HeroSlide & { alt: string })[] = [
   {
     image: heroClinicReception,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: " Your Smile is Our  Priority",
     description: "Experience world-class dental care at Muhazi Dental Clinic. Our expert team provides comprehensive dental services in a comfortable, modern environment.",
+    alt: "Modern Muhazi Dental Clinic reception area in Rwamagana",
   },
   {
     image: heroDentistPatient,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: "Expert Care for   Your Dental Health",
     description: "Our skilled dentists provide personalized treatment with the latest techniques and equipment.",
+    alt: "Dentist examining a patient at Muhazi Dental Clinic",
   },
   {
     image: heroHealthySmile,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: "Achieve the Perfect  Smile You Deserve",
     description: "From teeth whitening to complete dental makeovers, we help you achieve the smile of your dreams.",
+    alt: "Happy patient with a healthy white smile",
   },
 ];
 
