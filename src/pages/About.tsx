@@ -131,7 +131,7 @@ const About = () => {
               <div className="w-14 h-14 rounded-2xl warm-gradient flex items-center justify-center mb-6">
                 <Eye className="w-7 h-7 text-secondary-foreground" />
               </div>
-              <h3 className="text-2xl font-heading font-bold mb-4">Our Vision</h3>
+              <h2 className="text-2xl font-heading font-bold mb-4">Our Vision</h2>
               <p className="text-muted-foreground">
                 To be the leading dental care provider in Eastern Rwanda, recognized for 
                 excellence in patient care, innovative treatments, and community health 
