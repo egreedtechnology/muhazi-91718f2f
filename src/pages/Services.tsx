@@ -136,7 +136,7 @@ const Services = () => {
                       {service.category}
                     </span>
                   </div>
-                  <CardTitle asChild><h2 className="text-xl">{service.title}</h2></CardTitle>
+                  <h2 className="text-xl font-heading font-semibold leading-none tracking-tight">{service.title}</h2>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-muted-foreground text-sm">{service.description}</p>
