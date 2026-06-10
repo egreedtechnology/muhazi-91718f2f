@@ -31,26 +31,30 @@ interface HeroSlide {
   title: string;
   highlight: string;
   description: string;
+  alt: string;
 }
 
-const defaultHeroSlides: HeroSlide[] = [
+const defaultHeroSlides: (HeroSlide & { alt: string })[] = [
   {
     image: heroClinicReception,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: " Your Smile is Our  Priority",
     description: "Experience world-class dental care at Muhazi Dental Clinic. Our expert team provides comprehensive dental services in a comfortable, modern environment.",
+    alt: "Modern Muhazi Dental Clinic reception area in Rwamagana",
   },
   {
     image: heroDentistPatient,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: "Expert Care for   Your Dental Health",
     description: "Our skilled dentists provide personalized treatment with the latest techniques and equipment.",
+    alt: "Dentist examining a patient at Muhazi Dental Clinic",
   },
   {
     image: heroHealthySmile,
-    title: "Exellent in Dentist",
+    title: "Excellence in Dentistry",
     highlight: "Achieve the Perfect  Smile You Deserve",
     description: "From teeth whitening to complete dental makeovers, we help you achieve the smile of your dreams.",
+    alt: "Happy patient with a healthy white smile",
   },
 ];
 
@@ -119,9 +123,10 @@ const Index = () => {
       if (data && data.length > 0) {
         setHeroSlides(data.map((item, i) => ({
           image: item.media_url,
-          title: i === 0 ? "Exellent in Dentist" : "Welcome to",
+          title: i === 0 ? "Excellence in Dentistry" : "Welcome to",
           highlight: i === 0 ? "Your Smile is Our  Priority" : "Muhazi Dental Clinic",
           description: "Experience world-class dental care at Muhazi Dental Clinic with our expert team.",
+          alt: item.title || "Muhazi Dental Clinic",
         })));
       }
     };
@@ -163,7 +168,7 @@ const Index = () => {
   return (
     <PublicLayout>
       <SEOHead 
-        title="Muhazi Dental Clinic | Exellent in  Dentist Care in Rwamagana, Rwanda"
+        title="Muhazi Dental Clinic | Excellent Dental Care in Rwamagana, Rwanda"
         description="Muhazi Dental Clinic offers comprehensive dental care in Rwamagana, Rwanda. Book your appointment for teeth cleaning, fillings, root canal, whitening & more. Open 7 days."
         canonical="/"
       />
@@ -179,7 +184,7 @@ const Index = () => {
           >
             <img 
               src={slide.image} 
-              alt={`Slide ${index + 1}`}
+              alt={slide.alt}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-foreground/90 via-foreground/70 to-foreground/40" />

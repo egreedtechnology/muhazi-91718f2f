@@ -86,7 +86,7 @@ const Doctors = () => {
                 </div>
                 <CardContent className="p-6 space-y-4">
                   <div>
-                    <h3 className="font-heading font-bold text-xl">{doctor.name}</h3>
+                    <h2 className="font-heading font-bold text-xl">{doctor.name}</h2>
                     <p className="text-primary font-medium">{doctor.title}</p>
                   </div>
                   

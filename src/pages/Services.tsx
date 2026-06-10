@@ -136,7 +136,7 @@ const Services = () => {
                       {service.category}
                     </span>
                   </div>
-                  <CardTitle className="text-xl">{service.title}</CardTitle>
+                  <h2 className="text-xl font-heading font-semibold leading-none tracking-tight">{service.title}</h2>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-muted-foreground text-sm">{service.description}</p>
@@ -172,7 +172,7 @@ const Services = () => {
                 <Clock className="w-7 h-7 text-accent-foreground" />
               </div>
               <div className="flex-1">
-                <h3 className="font-heading font-bold text-lg mb-2">Pricing & Payment Options</h3>
+                <h2 className="font-heading font-bold text-lg mb-2">Pricing & Payment Options</h2>
                 <p className="text-muted-foreground text-sm">
                   Prices shown are starting prices. Final costs depend on the complexity of treatment. 
                   We accept cash, MTN Mobile Money, and Airtel Money. Contact us for a detailed quote 
