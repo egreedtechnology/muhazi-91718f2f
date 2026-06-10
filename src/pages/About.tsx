@@ -120,7 +120,7 @@ const About = () => {
               <div className="w-14 h-14 rounded-2xl hero-gradient flex items-center justify-center mb-6">
                 <Target className="w-7 h-7 text-primary-foreground" />
               </div>
-              <h3 className="text-2xl font-heading font-bold mb-4">Our Mission</h3>
+              <h2 className="text-2xl font-heading font-bold mb-4">Our Mission</h2>
               <p className="text-muted-foreground">
                 To deliver exceptional dental care that improves the oral health and overall 
                 well-being of our patients. We are committed to providing personalized treatment 
