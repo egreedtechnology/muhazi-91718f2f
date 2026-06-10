@@ -168,7 +168,7 @@ const Index = () => {
   return (
     <PublicLayout>
       <SEOHead 
-        title="Muhazi Dental Clinic | Exellent in  Dentist Care in Rwamagana, Rwanda"
+        title="Muhazi Dental Clinic | Excellent Dental Care in Rwamagana, Rwanda"
         description="Muhazi Dental Clinic offers comprehensive dental care in Rwamagana, Rwanda. Book your appointment for teeth cleaning, fillings, root canal, whitening & more. Open 7 days."
         canonical="/"
       />
