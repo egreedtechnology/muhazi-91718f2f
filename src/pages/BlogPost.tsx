@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SEOHead from "@/components/seo/SEOHead";
 import { Badge } from "@/components/ui/badge";
