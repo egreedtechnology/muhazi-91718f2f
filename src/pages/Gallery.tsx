@@ -83,7 +83,8 @@ const placeholderMedia: GalleryItem[] = [
 ];
 
 const Gallery = () => {
-  const [media, setMedia] = useState<GalleryItem[]>(placeholderMedia);
+  const [media, setMedia] = useState<GalleryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -93,15 +94,17 @@ const Gallery = () => {
   }, []);
 
   const fetchGalleryMedia = async () => {
+    setIsLoading(true);
     const { data, error } = await supabase
       .from("gallery_media")
       .select("*")
       .eq("is_active", true)
       .order("display_order", { ascending: true });
 
-    if (data && data.length > 0) {
+    if (!error && data) {
       setMedia(data);
     }
+    setIsLoading(false);
   };
 
   const filteredMedia = selectedCategory === "all" 
