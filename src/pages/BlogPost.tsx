@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SEOHead from "@/components/seo/SEOHead";
 import { Badge } from "@/components/ui/badge";
@@ -138,7 +139,13 @@ export default function BlogPost() {
 
         <div
           className="prose prose-lg max-w-none prose-headings:font-heading prose-a:text-primary"
-          dangerouslySetInnerHTML={{ __html: renderContent(post.content) }}
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(renderContent(post.content), {
+              USE_PROFILES: { html: true },
+              FORBID_TAGS: ["style", "script", "iframe", "object", "embed", "form"],
+              FORBID_ATTR: ["style", "onerror", "onload", "onclick"],
+            }),
+          }}
         />
       </article>
     </PublicLayout>
