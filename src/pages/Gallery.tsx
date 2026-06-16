@@ -191,11 +191,21 @@ const Gallery = () => {
                 <div className="aspect-[4/3] relative">
                   {item.media_type === "video" ? (
                     <>
-                      <img
-                        src={item.thumbnail_url || item.media_url}
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      {item.thumbnail_url ? (
+                        <img
+                          src={item.thumbnail_url}
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <video
+                          src={item.media_url}
+                          muted
+                          playsInline
+                          preload="metadata"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="w-16 h-16 rounded-full bg-primary/90 flex items-center justify-center">
                           <Play className="w-8 h-8 text-primary-foreground ml-1" />
@@ -226,7 +236,7 @@ const Gallery = () => {
             ))}
           </div>
 
-          {filteredMedia.length === 0 && (
+          {!isLoading && filteredMedia.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               No media found in this category.
             </div>
