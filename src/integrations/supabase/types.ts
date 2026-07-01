@@ -711,12 +711,18 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           created_at: string
+          department: string | null
           email: string | null
           full_name: string
           id: string
+          invited_at: string | null
+          invited_by: string | null
           is_active: boolean
+          last_login_at: string | null
           phone: string | null
+          position: string | null
           specialization: string | null
+          status: string
           updated_at: string
           user_id: string | null
           working_days: string[] | null
@@ -727,12 +733,18 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           full_name: string
           id?: string
+          invited_at?: string | null
+          invited_by?: string | null
           is_active?: boolean
+          last_login_at?: string | null
           phone?: string | null
+          position?: string | null
           specialization?: string | null
+          status?: string
           updated_at?: string
           user_id?: string | null
           working_days?: string[] | null
@@ -743,12 +755,18 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           created_at?: string
+          department?: string | null
           email?: string | null
           full_name?: string
           id?: string
+          invited_at?: string | null
+          invited_by?: string | null
           is_active?: boolean
+          last_login_at?: string | null
           phone?: string | null
+          position?: string | null
           specialization?: string | null
+          status?: string
           updated_at?: string
           user_id?: string | null
           working_days?: string[] | null
@@ -902,7 +920,20 @@ export type Database = {
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "super_admin" | "receptionist" | "dentist" | "accountant"
+      app_role:
+        | "super_admin"
+        | "receptionist"
+        | "dentist"
+        | "accountant"
+        | "manager"
+        | "dental_assistant"
+        | "it_admin"
+        | "cashier"
+        | "lab_technician"
+        | "pharmacist"
+        | "nurse"
+        | "cleaner"
+        | "security_guard"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1030,7 +1061,21 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "receptionist", "dentist", "accountant"],
+      app_role: [
+        "super_admin",
+        "receptionist",
+        "dentist",
+        "accountant",
+        "manager",
+        "dental_assistant",
+        "it_admin",
+        "cashier",
+        "lab_technician",
+        "pharmacist",
+        "nurse",
+        "cleaner",
+        "security_guard",
+      ],
     },
   },
 } as const
