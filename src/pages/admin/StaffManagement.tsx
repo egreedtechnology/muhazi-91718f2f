@@ -48,7 +48,20 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import mdcLogo from "@/assets/mdc-logo.jpg";
 
-type AppRole = "super_admin" | "receptionist" | "dentist" | "accountant";
+type AppRole =
+  | "super_admin"
+  | "manager"
+  | "receptionist"
+  | "dentist"
+  | "dental_assistant"
+  | "accountant"
+  | "it_admin"
+  | "cashier"
+  | "lab_technician"
+  | "pharmacist"
+  | "nurse"
+  | "cleaner"
+  | "security_guard";
 
 interface Staff {
   id: string;
