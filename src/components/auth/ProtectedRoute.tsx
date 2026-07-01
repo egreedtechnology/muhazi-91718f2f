@@ -2,7 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 
-type AppRole = "super_admin" | "receptionist" | "dentist" | "accountant";
+import type { AppRole } from "@/lib/rolePermissions";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

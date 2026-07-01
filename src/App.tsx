@@ -19,6 +19,7 @@ import PatientRegister from "./pages/patient/PatientRegister";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
 import StaffManagement from "./pages/admin/StaffManagement";
+import StaffAccounts from "./pages/admin/StaffAccounts";
 import GalleryManagement from "./pages/admin/GalleryManagement";
 import CalendarPage from "./pages/admin/Calendar";
 import Appointments from "./pages/admin/Appointments";
@@ -77,8 +78,16 @@ const App = () => (
             <Route
               path="/admin/staff"
               element={
-                <ProtectedRoute allowedRoles={["super_admin"]}>
+                <ProtectedRoute allowedRoles={["super_admin", "manager"]}>
                   <StaffManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/staff-accounts"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin", "manager"]}>
+                  <StaffAccounts />
                 </ProtectedRoute>
               }
             />
