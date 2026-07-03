@@ -72,7 +72,7 @@ export function InviteStaffDialog({ open, onOpenChange, onInvited }: Props) {
         action: "invite_staff",
         payload: {
           ...form,
-          redirectTo: `${window.location.origin}/admin`,
+          redirectTo: `${window.location.origin}/set-password`,
         },
       },
     });
