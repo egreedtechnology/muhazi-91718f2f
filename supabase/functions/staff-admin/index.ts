@@ -60,16 +60,75 @@ async function logActivity(
   }
 }
 
+async function requireAuth(req: Request) {
+  const auth = req.headers.get("Authorization") ?? "";
+  const token = auth.replace(/^Bearer\s+/i, "");
+  if (!token) return { error: "Missing authorization", status: 401 };
+  const { data: userData, error } = await admin.auth.getUser(token);
+  if (error || !userData?.user) return { error: "Unauthorized", status: 401 };
+  return { uid: userData.user.id, user: userData.user };
+}
+
+const SELF_ACTIONS = new Set(["activate_self", "get_invite_status"]);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response("ok", { headers: corsHeaders });
 
   try {
+    const { action, payload = {} } = await req.json();
+
+    // Actions the invited user calls for themselves (no manager gate).
+    if (SELF_ACTIONS.has(action)) {
+      const auth = await requireAuth(req);
+      if ("error" in auth) return json({ error: auth.error }, auth.status);
+      const selfId = auth.uid;
+      const selfUser = auth.user;
+
+      if (action === "get_invite_status") {
+        const { data: staff } = await admin
+          .from("staff")
+          .select("id, status, last_login_at, full_name")
+          .eq("user_id", selfId)
+          .maybeSingle();
+        return json({
+          user_id: selfId,
+          email: selfUser.email ?? null,
+          full_name: staff?.full_name ?? selfUser.user_metadata?.full_name ?? null,
+          status: staff?.status ?? null,
+          already_activated:
+            !!staff && staff.status === "active" && !!staff.last_login_at,
+        });
+      }
+
+      if (action === "activate_self") {
+        const nowIso = new Date().toISOString();
+        const { data: roles } = await admin
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", selfId);
+        await admin
+          .from("staff")
+          .update({
+            status: "active",
+            is_active: true,
+            last_login_at: nowIso,
+            activated_at: nowIso,
+          })
+          .eq("user_id", selfId);
+        await logActivity(selfId, "staff.activated", "staff", null, {
+          via: "set_password",
+        });
+        return json({
+          ok: true,
+          roles: (roles ?? []).map((r: any) => r.role),
+        });
+      }
+    }
+
     const gate = await requireManager(req);
     if ("error" in gate) return json({ error: gate.error }, gate.status);
     const actorId = gate.uid;
-
-    const { action, payload = {} } = await req.json();
 
     switch (action) {
       case "search_users": {
