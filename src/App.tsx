@@ -60,6 +60,8 @@ const App = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/set-password" element={<SetPassword />} />
+            <Route path="/auth/callback" element={<SetPassword />} />
             
             {/* Patient Portal Routes */}
             <Route path="/patient/portal" element={<PatientPortal />} />
