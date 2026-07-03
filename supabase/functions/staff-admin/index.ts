@@ -113,7 +113,6 @@ Deno.serve(async (req) => {
             status: "active",
             is_active: true,
             last_login_at: nowIso,
-            activated_at: nowIso,
           })
           .eq("user_id", selfId);
         await logActivity(selfId, "staff.activated", "staff", null, {
