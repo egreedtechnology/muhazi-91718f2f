@@ -37,6 +37,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import SetPassword from "./pages/auth/SetPassword";
+import Connect from "./pages/Connect";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/connect" element={<Connect />} />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/auth/callback" element={<SetPassword />} />
             
