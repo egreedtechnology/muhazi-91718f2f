@@ -94,6 +94,7 @@ const Footer = () => {
                 { href: "/book", label: "Book Appointment" },
                 { href: "/contact", label: "Contact Us" },
                 { href: "/patient/portal", label: "patient login" },
+                { href: "/connect", label: "Connect AI Assistant" },
               ].map((link) => (
                 <li key={link.href}>
                   <Link
