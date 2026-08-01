@@ -3,11 +3,11 @@
 // supabase function: mcp
 // Bundled from src/lib/mcp/index.ts by @lovable.dev/mcp-js.
 // src/lib/mcp/index.ts
-import { defineMcp } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { defineMcp, auth } from "npm:@lovable.dev/mcp-js@0.20.1";
 
 // src/lib/mcp/tools/list-services.ts
 import { createClient } from "npm:@supabase/supabase-js@^2.89.0";
-import { defineTool } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { defineTool } from "npm:@lovable.dev/mcp-js@0.20.1";
 import { z } from "npm:zod@^3.25.76";
 var list_services_default = defineTool({
   name: "list_services",
@@ -36,7 +36,7 @@ var list_services_default = defineTool({
 
 // src/lib/mcp/tools/list-doctors.ts
 import { createClient as createClient2 } from "npm:@supabase/supabase-js@^2.89.0";
-import { defineTool as defineTool2 } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { defineTool as defineTool2 } from "npm:@lovable.dev/mcp-js@0.20.1";
 import { z as z2 } from "npm:zod@^3.25.76";
 var list_doctors_default = defineTool2({
   name: "list_doctors",
@@ -63,7 +63,7 @@ var list_doctors_default = defineTool2({
 
 // src/lib/mcp/tools/list-announcements.ts
 import { createClient as createClient3 } from "npm:@supabase/supabase-js@^2.89.0";
-import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { defineTool as defineTool3 } from "npm:@lovable.dev/mcp-js@0.20.1";
 var list_announcements_default = defineTool3({
   name: "list_announcements",
   title: "List clinic announcements",
@@ -86,7 +86,7 @@ var list_announcements_default = defineTool3({
 });
 
 // src/lib/mcp/tools/clinic-info.ts
-import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.20.0";
+import { defineTool as defineTool4 } from "npm:@lovable.dev/mcp-js@0.20.1";
 var clinic_info_default = defineTool4({
   name: "clinic_info",
   title: "Muhazi Dental Clinic info",
@@ -116,9 +116,14 @@ var mcp_default = defineMcp({
   title: "Muhazi Dental Clinic",
   version: "0.1.0",
   instructions: "Tools for Muhazi Dental Clinic. Use `clinic_info` for hours/contact, `list_services` for clinical services, `list_doctors` for dentists, and `list_announcements` for current notices.",
+  auth: auth.oauth.issuer({
+    issuer: `${process.env.SUPABASE_URL}/auth/v1`,
+    acceptedAudiences: ["authenticated"],
+    resourceName: "Muhazi Dental Clinic MCP"
+  }),
   tools: [clinic_info_default, list_services_default, list_doctors_default, list_announcements_default]
 });
 
 // lovable-mcp-supabase-entry.ts
-import { createSupabaseHandler } from "npm:@lovable.dev/mcp-js@0.20.0/stacks/supabase";
+import { createSupabaseHandler } from "npm:@lovable.dev/mcp-js@0.20.1/stacks/supabase";
 Deno.serve(createSupabaseHandler(mcp_default, { functionName: "mcp" }));
