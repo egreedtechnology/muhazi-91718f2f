@@ -144,6 +144,8 @@ export type Database = {
         Row: {
           appointment_date: string
           appointment_time: string
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           created_by: string | null
           duration_minutes: number
@@ -158,6 +160,8 @@ export type Database = {
         Insert: {
           appointment_date: string
           appointment_time: string
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           created_by?: string | null
           duration_minutes?: number
@@ -172,6 +176,8 @@ export type Database = {
         Update: {
           appointment_date?: string
           appointment_time?: string
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           created_by?: string | null
           duration_minutes?: number
@@ -213,6 +219,117 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      archived_records: {
+        Row: {
+          archived_at: string
+          archived_by: string | null
+          checksum: string | null
+          created_at: string
+          id: string
+          label: string
+          legal_hold: boolean
+          legal_hold_reason: string | null
+          patient_ref: string | null
+          purged_at: string | null
+          purged_by: string | null
+          reason: string | null
+          restored_at: string | null
+          restored_by: string | null
+          retention_until: string | null
+          snapshot: Json
+          source_id: string
+          source_table: string
+          status: string
+          summary: string | null
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string
+          archived_by?: string | null
+          checksum?: string | null
+          created_at?: string
+          id?: string
+          label: string
+          legal_hold?: boolean
+          legal_hold_reason?: string | null
+          patient_ref?: string | null
+          purged_at?: string | null
+          purged_by?: string | null
+          reason?: string | null
+          restored_at?: string | null
+          restored_by?: string | null
+          retention_until?: string | null
+          snapshot: Json
+          source_id: string
+          source_table: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string
+          archived_by?: string | null
+          checksum?: string | null
+          created_at?: string
+          id?: string
+          label?: string
+          legal_hold?: boolean
+          legal_hold_reason?: string | null
+          patient_ref?: string | null
+          purged_at?: string | null
+          purged_by?: string | null
+          reason?: string | null
+          restored_at?: string | null
+          restored_by?: string | null
+          retention_until?: string | null
+          snapshot?: Json
+          source_id?: string
+          source_table?: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      backup_runs: {
+        Row: {
+          checksum: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          notes: string | null
+          record_count: number
+          scope: string
+          size_bytes: number
+          status: string
+        }
+        Insert: {
+          checksum?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          record_count?: number
+          scope: string
+          size_bytes?: number
+          status?: string
+        }
+        Update: {
+          checksum?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          record_count?: number
+          scope?: string
+          size_bytes?: number
+          status?: string
+        }
+        Relationships: []
       }
       blog_posts: {
         Row: {
@@ -339,6 +456,8 @@ export type Database = {
       }
       intake_forms: {
         Row: {
+          archived_at: string | null
+          archived_by: string | null
           form_data: Json
           form_type: string
           id: string
@@ -348,6 +467,8 @@ export type Database = {
           submitted_at: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
           form_data?: Json
           form_type?: string
           id?: string
@@ -357,6 +478,8 @@ export type Database = {
           submitted_at?: string
         }
         Update: {
+          archived_at?: string | null
+          archived_by?: string | null
           form_data?: Json
           form_type?: string
           id?: string
@@ -488,6 +611,8 @@ export type Database = {
       }
       messages: {
         Row: {
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           email: string | null
           full_name: string
@@ -500,6 +625,8 @@ export type Database = {
           subject: string
         }
         Insert: {
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           email?: string | null
           full_name: string
@@ -512,6 +639,8 @@ export type Database = {
           subject: string
         }
         Update: {
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           email?: string | null
           full_name?: string
@@ -563,6 +692,8 @@ export type Database = {
       patients: {
         Row: {
           address: string | null
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           date_of_birth: string | null
           email: string | null
@@ -575,6 +706,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
@@ -587,6 +720,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           date_of_birth?: string | null
           email?: string | null
@@ -666,6 +801,45 @@ export type Database = {
           full_name?: string
           id?: string
           phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      retention_policies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          label: string
+          legal_basis: string | null
+          minor_until_age: number | null
+          record_type: string
+          retention_years: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          label: string
+          legal_basis?: string | null
+          minor_until_age?: number | null
+          record_type: string
+          retention_years?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          label?: string
+          legal_basis?: string | null
+          minor_until_age?: number | null
+          record_type?: string
+          retention_years?: number
           updated_at?: string
         }
         Relationships: []
@@ -778,6 +952,8 @@ export type Database = {
       treatment_records: {
         Row: {
           appointment_id: string | null
+          archived_at: string | null
+          archived_by: string | null
           created_at: string
           diagnosis: string | null
           follow_up_date: string | null
@@ -792,6 +968,8 @@ export type Database = {
         }
         Insert: {
           appointment_id?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           diagnosis?: string | null
           follow_up_date?: string | null
@@ -806,6 +984,8 @@ export type Database = {
         }
         Update: {
           appointment_id?: string | null
+          archived_at?: string | null
+          archived_by?: string | null
           created_at?: string
           diagnosis?: string | null
           follow_up_date?: string | null
