@@ -3,7 +3,7 @@
 // supabase function: mcp
 // Bundled from src/lib/mcp/index.ts by @lovable.dev/mcp-js.
 // src/lib/mcp/index.ts
-import { defineMcp } from "npm:@lovable.dev/mcp-js@0.20.1";
+import { defineMcp, auth } from "npm:@lovable.dev/mcp-js@0.20.1";
 
 // src/lib/mcp/tools/list-services.ts
 import { createClient } from "npm:@supabase/supabase-js@^2.89.0";
@@ -116,6 +116,11 @@ var mcp_default = defineMcp({
   title: "Muhazi Dental Clinic",
   version: "0.1.0",
   instructions: "Tools for Muhazi Dental Clinic. Use `clinic_info` for hours/contact, `list_services` for clinical services, `list_doctors` for dentists, and `list_announcements` for current notices.",
+  auth: auth.oauth.issuer({
+    issuer: `${process.env.SUPABASE_URL}/auth/v1`,
+    acceptedAudiences: ["authenticated"],
+    resourceName: "Muhazi Dental Clinic MCP"
+  }),
   tools: [clinic_info_default, list_services_default, list_doctors_default, list_announcements_default]
 });
 
