@@ -31,6 +31,7 @@ import BlogManagement from "./pages/admin/BlogManagement";
 import AnnouncementsManagement from "./pages/admin/AnnouncementsManagement";
 import Triage from "./pages/admin/Triage";
 import AuditLogs from "./pages/admin/AuditLogs";
+import ArchivePage from "./pages/admin/Archive";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -181,6 +182,15 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["super_admin"]}>
                   <AuditLogs />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/archive"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin", "manager"]}>
+                  <ArchivePage />
                 </ProtectedRoute>
               }
             />
