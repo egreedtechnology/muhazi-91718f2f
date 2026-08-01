@@ -112,8 +112,9 @@ export default function Appointments() {
       supabase
         .from("appointments")
         .select(`*, patient:patients(id, full_name, phone, email), service:services(id, name, duration_minutes), staff:staff(id, full_name, specialization)`)
+        .is("archived_at", null)
         .order("appointment_date", { ascending: false }),
-      supabase.from("patients").select("id, full_name, phone, email").order("full_name"),
+      supabase.from("patients").select("id, full_name, phone, email").is("archived_at", null).order("full_name"),
       supabase.from("services").select("id, name, duration_minutes").eq("is_active", true),
       supabase.from("staff").select("id, full_name, specialization").eq("is_active", true),
     ]);

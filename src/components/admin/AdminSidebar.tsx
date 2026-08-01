@@ -19,6 +19,7 @@ import {
   LayoutGrid,
   ShieldCheck,
   UserCog,
+  Archive,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -56,6 +57,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
   {
     label: "System",
     items: [
+      { icon: Archive, label: "Archive", path: "/admin/archive", roles: ["super_admin", "manager"] },
       { icon: ShieldCheck, label: "Audit log", path: "/admin/audit-logs", roles: ["super_admin"] },
       { icon: Settings, label: "Settings", path: "/admin/settings", roles: ["super_admin"] },
     ],

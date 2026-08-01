@@ -105,6 +105,7 @@ export default function Messages() {
     const { data, error } = await supabase
       .from("messages")
       .select("*")
+      .is("archived_at", null)
       .order("created_at", { ascending: false });
 
     if (error) {
