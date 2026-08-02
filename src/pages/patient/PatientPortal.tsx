@@ -382,12 +382,15 @@ const PatientPortal = () => {
           </div>
 
           <Tabs defaultValue="upcoming" className="space-y-6">
-            <TabsList>
+            <TabsList className="flex-wrap h-auto">
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="requests">Requests</TabsTrigger>
+              <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
               <TabsTrigger value="records">Medical Records</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
+
 
             <TabsContent value="upcoming">
               <div className="space-y-4">
