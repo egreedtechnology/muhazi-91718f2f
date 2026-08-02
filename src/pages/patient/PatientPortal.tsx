@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Calendar, Clock, FileText, User, Phone, Mail, LogOut, RefreshCw, CalendarPlus, Stethoscope } from "lucide-react";
+import { Calendar, Clock, FileText, User, Phone, Mail, LogOut, RefreshCw, CalendarPlus, Stethoscope, MessageSquare, CalendarClock } from "lucide-react";
+import { PatientInbox } from "@/components/patient/PatientInbox";
+import { NotificationSettings } from "@/components/patient/NotificationSettings";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -44,12 +46,31 @@ interface TreatmentRecord {
   treated_by: { full_name: string } | null;
 }
 
+interface AppointmentRequest {
+  id: string;
+  appointment_id: string;
+  request_type: string;
+  requested_date: string | null;
+  requested_time: string | null;
+  reason: string | null;
+  status: string;
+  created_at: string;
+  processed_at: string | null;
+}
+
 const statusStyles: Record<string, string> = {
   pending: "bg-secondary/15 text-secondary border-secondary/30",
   confirmed: "bg-primary/15 text-primary border-primary/30",
   completed: "bg-muted text-muted-foreground border-border",
   cancelled: "bg-destructive/10 text-destructive border-destructive/30",
   rescheduled: "bg-accent/20 text-accent-foreground border-accent/40",
+};
+
+const requestStatusStyles: Record<string, string> = {
+  pending: "bg-secondary/15 text-secondary border-secondary/30",
+  approved: "bg-primary/15 text-primary border-primary/30",
+  rejected: "bg-destructive/10 text-destructive border-destructive/30",
+  completed: "bg-muted text-muted-foreground border-border",
 };
 
 const PatientPortal = () => {
@@ -59,6 +80,7 @@ const PatientPortal = () => {
   const [patientAccount, setPatientAccount] = useState<PatientAccount | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [treatmentRecords, setTreatmentRecords] = useState<TreatmentRecord[]>([]);
+  const [requests, setRequests] = useState<AppointmentRequest[]>([]);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [requestType, setRequestType] = useState<"reschedule" | "cancel">("reschedule");
@@ -98,6 +120,7 @@ const PatientPortal = () => {
       await Promise.all([
         fetchAppointments(account.patient_id),
         fetchTreatmentRecords(account.patient_id),
+        fetchRequests(account.id),
       ]);
     }
   };
@@ -137,15 +160,27 @@ const PatientPortal = () => {
     setTreatmentRecords(data || []);
   };
 
+  const fetchRequests = async (accountId: string) => {
+    const { data } = await supabase
+      .from("appointment_requests")
+      .select("id, appointment_id, request_type, requested_date, requested_time, reason, status, created_at, processed_at")
+      .eq("patient_account_id", accountId)
+      .order("created_at", { ascending: false });
+
+    setRequests(data || []);
+  };
+
   const handleRefresh = async () => {
     if (!patientAccount) return;
     setIsRefreshing(true);
     await Promise.all([
       fetchAppointments(patientAccount.patient_id),
       fetchTreatmentRecords(patientAccount.patient_id),
+      fetchRequests(patientAccount.id),
     ]);
     setIsRefreshing(false);
   };
+
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -354,12 +389,15 @@ const PatientPortal = () => {
           </div>
 
           <Tabs defaultValue="upcoming" className="space-y-6">
-            <TabsList>
+            <TabsList className="flex-wrap h-auto">
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+              <TabsTrigger value="requests">Requests</TabsTrigger>
+              <TabsTrigger value="messages">Messages</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
               <TabsTrigger value="records">Medical Records</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
+
 
             <TabsContent value="upcoming">
               <div className="space-y-4">
@@ -557,7 +595,79 @@ const PatientPortal = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="requests">
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      <CalendarClock className="w-5 h-5 text-primary" /> Reschedule & cancellation requests
+                    </CardTitle>
+                    <CardDescription>
+                      Use "Request Change" on an upcoming appointment to ask for a new date or time. Track the clinic's response here.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                {requests.length === 0 ? (
+                  <Card>
+                    <CardContent className="py-12 text-center text-muted-foreground">
+                      You haven't submitted any requests yet.
+                    </CardContent>
+                  </Card>
+                ) : (
+                  requests.map((req) => {
+                    const apt = appointments.find((a) => a.id === req.appointment_id);
+                    return (
+                      <Card key={req.id}>
+                        <CardContent className="py-4 space-y-2">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              <h3 className="font-semibold capitalize">
+                                {req.request_type === "cancel" ? "Cancellation request" : "Reschedule request"}
+                              </h3>
+                              {apt && (
+                                <p className="text-sm text-muted-foreground">
+                                  Original: {format(parseISO(apt.appointment_date), "MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
+                                </p>
+                              )}
+                              {req.requested_date && (
+                                <p className="text-sm text-muted-foreground">
+                                  Requested: {format(parseISO(req.requested_date), "MMMM d, yyyy")}
+                                  {req.requested_time ? ` at ${req.requested_time.slice(0, 5)}` : ""}
+                                </p>
+                              )}
+                              {req.reason && (
+                                <p className="text-sm text-muted-foreground italic mt-1">"{req.reason}"</p>
+                              )}
+                            </div>
+                            <div className="text-right space-y-1">
+                              <Badge variant="outline" className={requestStatusStyles[req.status] || ""}>
+                                {req.status}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground">
+                                Sent {format(parseISO(req.created_at), "MMM d, yyyy")}
+                              </p>
+                              {req.processed_at && (
+                                <p className="text-xs text-muted-foreground">
+                                  Answered {format(parseISO(req.processed_at), "MMM d, yyyy")}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="messages">
+              <PatientInbox patientAccountId={patientAccount.id} appointments={appointments} />
+            </TabsContent>
+
             <TabsContent value="profile">
+              <div className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">My details</CardTitle>
@@ -588,7 +698,14 @@ const PatientPortal = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              <NotificationSettings
+                patientAccountId={patientAccount.id}
+                hasEmail={Boolean(patientAccount.patient.email)}
+              />
+              </div>
             </TabsContent>
+
           </Tabs>
         </div>
       </section>
