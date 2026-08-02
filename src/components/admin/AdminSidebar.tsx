@@ -42,7 +42,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
       { icon: Users, label: "Patients", path: "/admin/patients", roles: ["super_admin", "receptionist", "dentist"] },
       { icon: MessageSquare, label: "Inbox", path: "/admin/messages", roles: ["super_admin", "receptionist"] },
       { icon: UserCircle, label: "Team profiles", path: "/admin/staff", roles: ["super_admin", "manager"] },
-      { icon: UserCog, label: "Staff accounts", path: "/admin/staff-accounts", roles: ["super_admin", "manager"] },
+      // Temporarily hidden: { icon: UserCog, label: "Staff accounts", path: "/admin/staff-accounts", roles: ["super_admin", "manager"] },
     ],
   },
   {
@@ -57,7 +57,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
   {
     label: "System",
     items: [
-      { icon: Archive, label: "Archive", path: "/admin/archive", roles: ["super_admin", "manager"] },
+      // Temporarily hidden: { icon: Archive, label: "Archive", path: "/admin/archive", roles: ["super_admin", "manager"] },
       { icon: ShieldCheck, label: "Audit log", path: "/admin/audit-logs", roles: ["super_admin"] },
       { icon: Settings, label: "Settings", path: "/admin/settings", roles: ["super_admin"] },
     ],
