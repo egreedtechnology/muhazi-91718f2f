@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Calendar, Clock, FileText, User, Phone, Mail, LogOut, RefreshCw, CalendarPlus, Stethoscope } from "lucide-react";
+import { Calendar, Clock, FileText, User, Phone, Mail, LogOut, RefreshCw, CalendarPlus, Stethoscope, MessageSquare, CalendarClock } from "lucide-react";
+import { PatientInbox } from "@/components/patient/PatientInbox";
+import { NotificationSettings } from "@/components/patient/NotificationSettings";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
