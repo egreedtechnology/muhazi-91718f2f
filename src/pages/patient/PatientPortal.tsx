@@ -113,6 +113,7 @@ const PatientPortal = () => {
       await Promise.all([
         fetchAppointments(account.patient_id),
         fetchTreatmentRecords(account.patient_id),
+        fetchRequests(account.id),
       ]);
     }
   };
