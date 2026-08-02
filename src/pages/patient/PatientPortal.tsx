@@ -588,7 +588,79 @@ const PatientPortal = () => {
               </div>
             </TabsContent>
 
+            <TabsContent value="requests">
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      <CalendarClock className="w-5 h-5 text-primary" /> Reschedule & cancellation requests
+                    </CardTitle>
+                    <CardDescription>
+                      Use "Request Change" on an upcoming appointment to ask for a new date or time. Track the clinic's response here.
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+
+                {requests.length === 0 ? (
+                  <Card>
+                    <CardContent className="py-12 text-center text-muted-foreground">
+                      You haven't submitted any requests yet.
+                    </CardContent>
+                  </Card>
+                ) : (
+                  requests.map((req) => {
+                    const apt = appointments.find((a) => a.id === req.appointment_id);
+                    return (
+                      <Card key={req.id}>
+                        <CardContent className="py-4 space-y-2">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                              <h3 className="font-semibold capitalize">
+                                {req.request_type === "cancel" ? "Cancellation request" : "Reschedule request"}
+                              </h3>
+                              {apt && (
+                                <p className="text-sm text-muted-foreground">
+                                  Original: {format(parseISO(apt.appointment_date), "MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
+                                </p>
+                              )}
+                              {req.requested_date && (
+                                <p className="text-sm text-muted-foreground">
+                                  Requested: {format(parseISO(req.requested_date), "MMMM d, yyyy")}
+                                  {req.requested_time ? ` at ${req.requested_time.slice(0, 5)}` : ""}
+                                </p>
+                              )}
+                              {req.reason && (
+                                <p className="text-sm text-muted-foreground italic mt-1">"{req.reason}"</p>
+                              )}
+                            </div>
+                            <div className="text-right space-y-1">
+                              <Badge variant="outline" className={requestStatusStyles[req.status] || ""}>
+                                {req.status}
+                              </Badge>
+                              <p className="text-xs text-muted-foreground">
+                                Sent {format(parseISO(req.created_at), "MMM d, yyyy")}
+                              </p>
+                              {req.processed_at && (
+                                <p className="text-xs text-muted-foreground">
+                                  Answered {format(parseISO(req.processed_at), "MMM d, yyyy")}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="messages">
+              <PatientInbox patientAccountId={patientAccount.id} appointments={appointments} />
+            </TabsContent>
+
             <TabsContent value="profile">
+              <div className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">My details</CardTitle>
