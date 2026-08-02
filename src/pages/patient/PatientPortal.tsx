@@ -73,6 +73,7 @@ const PatientPortal = () => {
   const [patientAccount, setPatientAccount] = useState<PatientAccount | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [treatmentRecords, setTreatmentRecords] = useState<TreatmentRecord[]>([]);
+  const [requests, setRequests] = useState<AppointmentRequest[]>([]);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [requestType, setRequestType] = useState<"reschedule" | "cancel">("reschedule");
