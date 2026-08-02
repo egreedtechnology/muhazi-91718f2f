@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Calendar, Clock, FileText, User, Bell, ChevronRight } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Calendar, Clock, FileText, User, Phone, Mail, LogOut, RefreshCw, CalendarPlus, Stethoscope } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { format } from "date-fns";
+import { format, differenceInCalendarDays, parseISO } from "date-fns";
 
 interface PatientAccount {
   id: string;
@@ -43,9 +44,18 @@ interface TreatmentRecord {
   treated_by: { full_name: string } | null;
 }
 
+const statusStyles: Record<string, string> = {
+  pending: "bg-secondary/15 text-secondary border-secondary/30",
+  confirmed: "bg-primary/15 text-primary border-primary/30",
+  completed: "bg-muted text-muted-foreground border-border",
+  cancelled: "bg-destructive/10 text-destructive border-destructive/30",
+  rescheduled: "bg-accent/20 text-accent-foreground border-accent/40",
+};
+
 const PatientPortal = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [patientAccount, setPatientAccount] = useState<PatientAccount | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [treatmentRecords, setTreatmentRecords] = useState<TreatmentRecord[]>([]);
@@ -55,7 +65,9 @@ const PatientPortal = () => {
   const [requestReason, setRequestReason] = useState("");
   const [requestedDate, setRequestedDate] = useState("");
   const [requestedTime, setRequestedTime] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkAuth();
@@ -71,7 +83,6 @@ const PatientPortal = () => {
   };
 
   const fetchPatientData = async (userId: string) => {
-    // Get patient account
     const { data: account } = await supabase
       .from("patient_accounts")
       .select(`
@@ -126,9 +137,33 @@ const PatientPortal = () => {
     setTreatmentRecords(data || []);
   };
 
+  const handleRefresh = async () => {
+    if (!patientAccount) return;
+    setIsRefreshing(true);
+    await Promise.all([
+      fetchAppointments(patientAccount.patient_id),
+      fetchTreatmentRecords(patientAccount.patient_id),
+    ]);
+    setIsRefreshing(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/patient/login");
+  };
+
   const handleSubmitRequest = async () => {
     if (!selectedAppointment || !patientAccount) return;
+    if (requestType === "reschedule" && (!requestedDate || !requestedTime)) {
+      toast({ title: "Missing details", description: "Choose a preferred date and time.", variant: "destructive" });
+      return;
+    }
+    if (!requestReason.trim()) {
+      toast({ title: "Reason required", description: "Please tell us why you need this change.", variant: "destructive" });
+      return;
+    }
 
+    setSubmitting(true);
     const { error } = await supabase.from("appointment_requests").insert({
       appointment_id: selectedAppointment.id,
       patient_account_id: patientAccount.id,
@@ -137,39 +172,42 @@ const PatientPortal = () => {
       requested_time: requestType === "reschedule" ? requestedTime : null,
       reason: requestReason,
     });
+    setSubmitting(false);
 
     if (error) {
       toast({ title: "Error", description: "Failed to submit request", variant: "destructive" });
     } else {
-      toast({ title: "Success", description: "Your request has been submitted" });
+      toast({ title: "Request sent", description: "The clinic will contact you shortly." });
       setRequestDialogOpen(false);
       setRequestReason("");
       setRequestedDate("");
       setRequestedTime("");
+      handleRefresh();
     }
   };
 
-  const upcomingAppointments = appointments.filter(
-    apt => new Date(apt.appointment_date) >= new Date() && apt.status !== "cancelled"
-  );
+  const today = new Date(new Date().toDateString());
+  const upcomingAppointments = appointments
+    .filter(apt => new Date(apt.appointment_date) >= today && apt.status !== "cancelled")
+    .sort((a, b) => a.appointment_date.localeCompare(b.appointment_date));
 
   const pastAppointments = appointments.filter(
-    apt => new Date(apt.appointment_date) < new Date() || apt.status === "cancelled"
+    apt => new Date(apt.appointment_date) < today || apt.status === "cancelled"
   );
 
-  const statusColors: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    confirmed: "bg-green-100 text-green-800",
-    completed: "bg-blue-100 text-blue-800",
-    cancelled: "bg-red-100 text-red-800",
-    rescheduled: "bg-purple-100 text-purple-800",
-  };
+  const nextAppointment = upcomingAppointments[0];
 
   if (isLoading) {
     return (
       <PublicLayout>
-        <div className="pt-32 pb-16 min-h-screen flex items-center justify-center">
-          <div className="text-muted-foreground">Loading...</div>
+        <div className="pt-32 pb-16 min-h-screen container-custom px-4 space-y-6">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+            <Skeleton className="h-28" />
+          </div>
+          <Skeleton className="h-64" />
         </div>
       </PublicLayout>
     );
@@ -217,9 +255,12 @@ const PatientPortal = () => {
                   Your account is not linked to a patient record yet. Please contact the clinic.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-3">
                 <Button asChild className="w-full">
                   <Link to="/contact">Contact Clinic</Link>
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={handleSignOut}>
+                  Sign out
                 </Button>
               </CardContent>
             </Card>
@@ -234,54 +275,82 @@ const PatientPortal = () => {
       <section className="pt-32 pb-16 min-h-screen bg-gradient-to-b from-primary/5 to-background">
         <div className="container-custom px-4">
           {/* Welcome Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">
-              Welcome, {patientAccount.patient.full_name}
-            </h1>
-            <p className="text-muted-foreground">Manage your appointments and view your records</p>
+          <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">
+                Welcome, {patientAccount.patient.full_name}
+              </h1>
+              <p className="text-muted-foreground">Manage your appointments and view your records</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+                Refresh
+              </Button>
+              <Button asChild size="sm">
+                <Link to="/book"><CalendarPlus className="w-4 h-4 mr-2" />Book</Link>
+              </Button>
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />Sign out
+              </Button>
+            </div>
           </div>
+
+          {/* Next appointment highlight */}
+          {nextAppointment && (
+            <Card className="mb-8 border-primary/30 bg-primary/5">
+              <CardContent className="py-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex gap-4 items-start">
+                  <div className="p-3 rounded-xl bg-primary/15">
+                    <Stethoscope className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-primary font-medium">Your next visit</p>
+                    <h2 className="text-lg font-semibold">
+                      {nextAppointment.service?.name || "Dental Appointment"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {format(parseISO(nextAppointment.appointment_date), "EEEE, MMMM d, yyyy")} at{" "}
+                      {nextAppointment.appointment_time.slice(0, 5)} · {nextAppointment.staff?.full_name || "Doctor TBD"}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-left md:text-right">
+                  <p className="text-2xl font-bold text-primary">
+                    {(() => {
+                      const days = differenceInCalendarDays(parseISO(nextAppointment.appointment_date), today);
+                      return days === 0 ? "Today" : days === 1 ? "Tomorrow" : `In ${days} days`;
+                    })()}
+                  </p>
+                  <Badge variant="outline" className={statusStyles[nextAppointment.status]}>
+                    {nextAppointment.status}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-primary/10">
-                    <Calendar className="w-6 h-6 text-primary" />
+            {[
+              { icon: Calendar, value: upcomingAppointments.length, label: "Upcoming Appointments" },
+              { icon: FileText, value: treatmentRecords.length, label: "Treatment Records" },
+              { icon: Clock, value: pastAppointments.length, label: "Past Visits" },
+            ].map(stat => (
+              <Card key={stat.label}>
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 rounded-full bg-primary/10">
+                      <stat.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{stat.value}</p>
+                      <p className="text-sm text-muted-foreground">{stat.label}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-2xl font-bold">{upcomingAppointments.length}</p>
-                    <p className="text-sm text-muted-foreground">Upcoming Appointments</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-green-100">
-                    <FileText className="w-6 h-6 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{treatmentRecords.length}</p>
-                    <p className="text-sm text-muted-foreground">Treatment Records</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-full bg-blue-100">
-                    <Clock className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{pastAppointments.length}</p>
-                    <p className="text-sm text-muted-foreground">Past Visits</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           <Tabs defaultValue="upcoming" className="space-y-6">
@@ -289,6 +358,7 @@ const PatientPortal = () => {
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
               <TabsTrigger value="records">Medical Records</TabsTrigger>
+              <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
 
             <TabsContent value="upcoming">
@@ -315,12 +385,15 @@ const PatientPortal = () => {
                             <div>
                               <h3 className="font-semibold">{apt.service?.name || "Dental Appointment"}</h3>
                               <p className="text-sm text-muted-foreground">
-                                {format(new Date(apt.appointment_date), "EEEE, MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
+                                {format(parseISO(apt.appointment_date), "EEEE, MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
                               </p>
                               <p className="text-sm text-muted-foreground">
                                 With: {apt.staff?.full_name || "TBD"}
                               </p>
-                              <Badge className={`mt-2 ${statusColors[apt.status]}`}>
+                              {apt.notes && (
+                                <p className="text-sm text-muted-foreground mt-1 italic">{apt.notes}</p>
+                              )}
+                              <Badge variant="outline" className={`mt-2 ${statusStyles[apt.status]}`}>
                                 {apt.status}
                               </Badge>
                             </div>
@@ -387,8 +460,8 @@ const PatientPortal = () => {
                                     />
                                   </div>
 
-                                  <Button onClick={handleSubmitRequest} className="w-full">
-                                    Submit Request
+                                  <Button onClick={handleSubmitRequest} className="w-full" disabled={submitting}>
+                                    {submitting ? "Submitting..." : "Submit Request"}
                                   </Button>
                                 </div>
                               </DialogContent>
@@ -414,17 +487,17 @@ const PatientPortal = () => {
                   pastAppointments.map(apt => (
                     <Card key={apt.id}>
                       <CardContent className="py-4">
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start gap-4">
                           <div>
                             <h3 className="font-semibold">{apt.service?.name || "Dental Appointment"}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {format(new Date(apt.appointment_date), "MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
+                              {format(parseISO(apt.appointment_date), "MMMM d, yyyy")} at {apt.appointment_time.slice(0, 5)}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               With: {apt.staff?.full_name || "N/A"}
                             </p>
                           </div>
-                          <Badge className={statusColors[apt.status]}>{apt.status}</Badge>
+                          <Badge variant="outline" className={statusStyles[apt.status]}>{apt.status}</Badge>
                         </div>
                       </CardContent>
                     </Card>
@@ -448,7 +521,7 @@ const PatientPortal = () => {
                         <div className="flex justify-between items-start mb-3">
                           <div>
                             <p className="font-semibold">
-                              {format(new Date(record.treatment_date), "MMMM d, yyyy")}
+                              {format(parseISO(record.treatment_date), "MMMM d, yyyy")}
                             </p>
                             <p className="text-sm text-muted-foreground">
                               Treated by: {record.treated_by?.full_name || "N/A"}
@@ -482,6 +555,39 @@ const PatientPortal = () => {
                   ))
                 )}
               </div>
+            </TabsContent>
+
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">My details</CardTitle>
+                  <CardDescription>
+                    To update your details, please contact the clinic reception.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <User className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{patientAccount.patient.full_name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{patientAccount.patient.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-primary" />
+                    <span className="text-sm">{patientAccount.patient.email || "No email on file"}</span>
+                  </div>
+                  <div className="pt-2 flex gap-2">
+                    <Button asChild variant="outline" size="sm">
+                      <Link to="/contact">Contact clinic</Link>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                      <LogOut className="w-4 h-4 mr-2" />Sign out
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
