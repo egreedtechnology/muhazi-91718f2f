@@ -691,7 +691,14 @@ const PatientPortal = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              <NotificationSettings
+                patientAccountId={patientAccount.id}
+                hasEmail={Boolean(patientAccount.patient.email)}
+              />
+              </div>
             </TabsContent>
+
           </Tabs>
         </div>
       </section>
