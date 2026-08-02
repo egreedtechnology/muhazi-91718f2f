@@ -46,6 +46,18 @@ interface TreatmentRecord {
   treated_by: { full_name: string } | null;
 }
 
+interface AppointmentRequest {
+  id: string;
+  appointment_id: string;
+  request_type: string;
+  requested_date: string | null;
+  requested_time: string | null;
+  reason: string | null;
+  status: string;
+  created_at: string;
+  processed_at: string | null;
+}
+
 const statusStyles: Record<string, string> = {
   pending: "bg-secondary/15 text-secondary border-secondary/30",
   confirmed: "bg-primary/15 text-primary border-primary/30",
