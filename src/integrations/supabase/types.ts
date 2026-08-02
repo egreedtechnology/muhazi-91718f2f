@@ -689,6 +689,113 @@ export type Database = {
           },
         ]
       }
+      patient_messages: {
+        Row: {
+          appointment_id: string | null
+          body: string
+          created_at: string
+          id: string
+          is_read: boolean
+          patient_account_id: string
+          read_at: string | null
+          sender_role: string
+          sender_user_id: string | null
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          patient_account_id: string
+          read_at?: string | null
+          sender_role?: string
+          sender_user_id?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          appointment_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          patient_account_id?: string
+          read_at?: string | null
+          sender_role?: string
+          sender_user_id?: string | null
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_messages_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_messages_patient_account_id_fkey"
+            columns: ["patient_account_id"]
+            isOneToOne: false
+            referencedRelation: "patient_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_notification_preferences: {
+        Row: {
+          appointment_reminders: boolean
+          appointment_updates: boolean
+          created_at: string
+          email_enabled: boolean
+          id: string
+          patient_account_id: string
+          reminder_hours_before: number
+          sms_enabled: boolean
+          treatment_updates: boolean
+          updated_at: string
+          whatsapp_enabled: boolean
+        }
+        Insert: {
+          appointment_reminders?: boolean
+          appointment_updates?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          patient_account_id: string
+          reminder_hours_before?: number
+          sms_enabled?: boolean
+          treatment_updates?: boolean
+          updated_at?: string
+          whatsapp_enabled?: boolean
+        }
+        Update: {
+          appointment_reminders?: boolean
+          appointment_updates?: boolean
+          created_at?: string
+          email_enabled?: boolean
+          id?: string
+          patient_account_id?: string
+          reminder_hours_before?: number
+          sms_enabled?: boolean
+          treatment_updates?: boolean
+          updated_at?: string
+          whatsapp_enabled?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_notification_preferences_patient_account_id_fkey"
+            columns: ["patient_account_id"]
+            isOneToOne: true
+            referencedRelation: "patient_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null
