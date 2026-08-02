@@ -66,6 +66,13 @@ const statusStyles: Record<string, string> = {
   rescheduled: "bg-accent/20 text-accent-foreground border-accent/40",
 };
 
+const requestStatusStyles: Record<string, string> = {
+  pending: "bg-secondary/15 text-secondary border-secondary/30",
+  approved: "bg-primary/15 text-primary border-primary/30",
+  rejected: "bg-destructive/10 text-destructive border-destructive/30",
+  completed: "bg-muted text-muted-foreground border-border",
+};
+
 const PatientPortal = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
