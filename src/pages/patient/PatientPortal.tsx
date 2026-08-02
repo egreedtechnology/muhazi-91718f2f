@@ -153,15 +153,27 @@ const PatientPortal = () => {
     setTreatmentRecords(data || []);
   };
 
+  const fetchRequests = async (accountId: string) => {
+    const { data } = await supabase
+      .from("appointment_requests")
+      .select("id, appointment_id, request_type, requested_date, requested_time, reason, status, created_at, processed_at")
+      .eq("patient_account_id", accountId)
+      .order("created_at", { ascending: false });
+
+    setRequests(data || []);
+  };
+
   const handleRefresh = async () => {
     if (!patientAccount) return;
     setIsRefreshing(true);
     await Promise.all([
       fetchAppointments(patientAccount.patient_id),
       fetchTreatmentRecords(patientAccount.patient_id),
+      fetchRequests(patientAccount.id),
     ]);
     setIsRefreshing(false);
   };
+
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
