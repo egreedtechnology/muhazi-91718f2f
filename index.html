@@ -47,7 +47,10 @@
     {
       "@context": "https://schema.org",
       "@type": "Dentist",
+      "@id": "https://muhazidentalclinic.org/#clinic",
       "name": "Muhazi Dental Clinic",
+      "alternateName": ["Muhazi Dental", "MDC Rwanda", "Ivuriro ry'amenyo Muhazi"],
+      "description": "Dental clinic in Rwamagana, Rwanda offering checkups, teeth cleaning, fillings, root canal treatment, whitening, extractions, braces and implants. Open 7 days a week, 8AM–8PM.",
       "image": "https://muhazidentalclinic.org/mdc-logo.jpg",
       "logo": "https://muhazidentalclinic.org/mdc-logo.jpg",
       "url": "https://muhazidentalclinic.org",
@@ -58,16 +61,40 @@
         "streetAddress": "2nd Floor, Above MTN Branch",
         "addressLocality": "Rwamagana",
         "addressRegion": "Eastern Province",
+        "postalCode": "",
         "addressCountry": "RW"
       },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -1.9486,
+        "longitude": 30.4347
+      },
+      "areaServed": [
+        {"@type": "City", "name": "Rwamagana"},
+        {"@type": "AdministrativeArea", "name": "Eastern Province"},
+        {"@type": "City", "name": "Kigali"},
+        {"@type": "Country", "name": "Rwanda"}
+      ],
+      "knowsLanguage": ["en", "rw", "fr"],
       "openingHoursSpecification": {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
         "opens": "08:00",
         "closes": "20:00"
       },
-      "priceRange": "$$",
       "hasMap": "https://maps.google.com/?q=Muhazi+Dental+Clinic+Rwamagana",
+      "potentialAction": {
+        "@type": "ReserveAction",
+        "name": "Book a dental appointment",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://muhazidentalclinic.org/book",
+          "actionPlatform": [
+            "http://schema.org/DesktopWebPlatform",
+            "http://schema.org/MobileWebPlatform"
+          ]
+        }
+      },
       "sameAs": [
         "https://www.facebook.com/muhazidc",
         "https://www.instagram.com/muhazi_dental",
@@ -76,14 +103,22 @@
       ],
       "medicalSpecialty": "Dentistry",
       "availableService": [
-        {"@type": "MedicalProcedure", "name": "Teeth Cleaning"},
+        {"@type": "MedicalProcedure", "name": "Dental Checkup"},
+        {"@type": "MedicalProcedure", "name": "Teeth Cleaning (Scaling & Polishing)"},
         {"@type": "MedicalProcedure", "name": "Dental Filling"},
         {"@type": "MedicalProcedure", "name": "Root Canal Treatment"},
         {"@type": "MedicalProcedure", "name": "Teeth Whitening"},
         {"@type": "MedicalProcedure", "name": "Tooth Extraction"},
+        {"@type": "MedicalProcedure", "name": "Wisdom Tooth Removal"},
+        {"@type": "MedicalProcedure", "name": "Braces & Orthodontics"},
+        {"@type": "MedicalProcedure", "name": "Dental Crowns & Bridges"},
+        {"@type": "MedicalProcedure", "name": "Pediatric Dentistry"},
+        {"@type": "MedicalProcedure", "name": "Gum Treatment"},
         {"@type": "MedicalProcedure", "name": "Dental Implants"}
       ]
     }
+    </script>
+
     </script>
     <script type="application/ld+json">
     {
