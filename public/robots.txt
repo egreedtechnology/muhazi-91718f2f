@@ -13,13 +13,24 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /patient
+Disallow: /set-password
+Disallow: /auth/
 
 # Sitemap
 Sitemap: https://muhazidentalclinic.org/sitemap.xml
-
-# Disallow admin and patient portal pages
-User-agent: *
-Disallow: /admin
-Disallow: /patient
