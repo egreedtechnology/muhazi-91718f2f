@@ -1,69 +1,57 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://muhazidentalclinic.org/</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/about</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/services</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/services</loc>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/doctors</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/doctors</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/gallery</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/gallery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/contact</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/book</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/book</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/blog</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/connect</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-
-  <url>
-    <loc>https://muhazidentalclinic.org/privacy</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/connect</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://muhazidentalclinic.org/terms</loc>
-    <lastmod>2026-06-10</lastmod>
+    <loc>https://muhazi.lovable.app/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://muhazi.lovable.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
