@@ -33,4 +33,4 @@ Disallow: /set-password
 Disallow: /auth/
 
 # Sitemap
-Sitemap: https://muhazi.lovable.app/sitemap.xml
+Sitemap: https:/muhazidentalclinic.org/sitemap.xml
