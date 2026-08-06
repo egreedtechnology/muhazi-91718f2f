@@ -1,58 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset
+    xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
   <url>
-    <loc>https://muhazi.lovable.app/</loc>
-    <changefreq>weekly</changefreq>
+    <loc>https://www.muhazidentalclinic.org/</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>hourly</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
-    <loc>https://muhazi.lovable.app/about</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://www.muhazidentalclinic.org/about</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
-    <loc>https://muhazi.lovable.app/services</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://muhazi.lovable.app/doctors</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://muhazi.lovable.app/gallery</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://muhazi.lovable.app/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://muhazi.lovable.app/book</loc>
+    <loc>https://www.muhazidentalclinic.org/services</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
+
   <url>
-    <loc>https://muhazi.lovable.app/blog</loc>
+    <loc>https://www.muhazidentalclinic.org/doctors</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
     <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.muhazidentalclinic.org/gallery</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
+
   <url>
-    <loc>https://muhazi.lovable.app/connect</loc>
+    <loc>https://www.muhazidentalclinic.org/contact</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.muhazidentalclinic.org/book</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.muhazidentalclinic.org/blog</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.muhazidentalclinic.org/connect</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://www.muhazidentalclinic.org/privacy</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+
   <url>
-    <loc>https://muhazi.lovable.app/privacy</loc>
+    <loc>https://www.muhazidentalclinic.org/terms</loc>
+    <lastmod>2026-08-06T20:00:00+02:00</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
-  <url>
-    <loc>https://muhazi.lovable.app/terms</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
+
 </urlset>
