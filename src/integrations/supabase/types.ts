@@ -334,56 +334,130 @@ export type Database = {
       blog_posts: {
         Row: {
           author_id: string | null
+          author_name: string | null
           category: string
           content: string
+          cover_image_alt: string | null
           cover_image_url: string | null
           created_at: string
           excerpt: string | null
+          faqs: Json
+          focus_keyword: string | null
           id: string
+          is_featured: boolean
           is_published: boolean
+          medical_reviewer: string | null
           meta_description: string | null
           meta_keywords: string | null
           meta_title: string | null
           published_at: string | null
+          reading_minutes: number | null
+          scheduled_at: string | null
           slug: string
+          summary: string | null
+          tags: string[]
           title: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           author_id?: string | null
+          author_name?: string | null
           category?: string
           content: string
+          cover_image_alt?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          faqs?: Json
+          focus_keyword?: string | null
           id?: string
+          is_featured?: boolean
           is_published?: boolean
+          medical_reviewer?: string | null
           meta_description?: string | null
           meta_keywords?: string | null
           meta_title?: string | null
           published_at?: string | null
+          reading_minutes?: number | null
+          scheduled_at?: string | null
           slug: string
+          summary?: string | null
+          tags?: string[]
           title: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           author_id?: string | null
+          author_name?: string | null
           category?: string
           content?: string
+          cover_image_alt?: string | null
           cover_image_url?: string | null
           created_at?: string
           excerpt?: string | null
+          faqs?: Json
+          focus_keyword?: string | null
           id?: string
+          is_featured?: boolean
           is_published?: boolean
+          medical_reviewer?: string | null
           meta_description?: string | null
           meta_keywords?: string | null
           meta_title?: string | null
           published_at?: string | null
+          reading_minutes?: number | null
+          scheduled_at?: string | null
           slug?: string
+          summary?: string | null
+          tags?: string[]
           title?: string
           updated_at?: string
+          view_count?: number
         }
         Relationships: []
+      }
+      blog_revisions: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          excerpt: string | null
+          id: string
+          note: string | null
+          post_id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          excerpt?: string | null
+          id?: string
+          note?: string | null
+          post_id: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          excerpt?: string | null
+          id?: string
+          note?: string | null
+          post_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_revisions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clinic_settings: {
         Row: {
@@ -1204,6 +1278,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_blog_view: { Args: { _slug: string }; Returns: undefined }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
