@@ -1,0 +1,1 @@
+- Blog AI features call the Lovable AI Gateway from staff-only edge functions; captions stream via Responses SSE parsed in the browser — keeps the key server-side.
