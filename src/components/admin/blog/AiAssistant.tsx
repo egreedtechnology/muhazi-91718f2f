@@ -38,7 +38,14 @@ export default function AiAssistant({ title, content, keyword, onInsert, onRepla
   const [busy, setBusy] = useState<Task | null>(null);
   const [result, setResult] = useState<{ task: Task; html: string } | null>(null);
 
+  const plainContent = (content || "").replace(/<[^>]*>/g, "").trim();
+  const hasInput = !!title?.trim() || !!plainContent;
+
   const run = async (task: Task) => {
+    if (!hasInput) {
+      toast({ title: "AI assistant", description: "Add a title or write some content first." });
+      return;
+    }
     setBusy(task);
     setResult(null);
     try {
@@ -94,7 +101,8 @@ export default function AiAssistant({ title, content, keyword, onInsert, onRepla
               variant="outline"
               size="sm"
               className="justify-start h-auto py-2 text-xs"
-              disabled={!!busy}
+              disabled={!!busy || !hasInput}
+              title={!hasInput ? "Add a title or some content first" : undefined}
               onClick={() => run(t.id)}
             >
               {busy === t.id ? <Loader2 className="w-3 h-3 mr-2 animate-spin" /> : <Sparkles className="w-3 h-3 mr-2" />}
