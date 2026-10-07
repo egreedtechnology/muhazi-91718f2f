@@ -4,7 +4,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, TrendingUp, Rocket, FileText, Eye, Check } from "lucide-react";
+import { Loader2, TrendingUp, Rocket, FileText, Eye, Check, ImageIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { streamImage } from "@/lib/blog/streamImage";
+import { uploadBlogImage } from "@/components/admin/blog/RichEditor";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -36,9 +40,34 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
   const [preview, setPreview] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const [withImage, setWithImage] = useState(true);
+  const [images, setImages] = useState<Record<number, { src: string; final: boolean }>>({});
+  const [imaging, setImaging] = useState<number | null>(null);
+
+  const makeImage = async (i: number, signal: AbortSignal): Promise<string | null> => {
+    if (images[i]?.final) return images[i].src;
+    setImaging(i);
+    let final: string | null = null;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      await streamImage(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/blog-trending`,
+        { mode: "image", title: ideas[i].title, angle: ideas[i].angle },
+        (src, isFinal) => { setImages((s) => ({ ...s, [i]: { src, final: isFinal } })); if (isFinal) final = src; },
+        signal,
+        { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY, Authorization: `Bearer ${session?.access_token ?? ""}` },
+      );
+      return final;
+    } catch (e: any) {
+      if (e?.name === "AbortError") throw e;
+      setImages((s) => { const n = { ...s }; delete n[i]; return n; });
+      toast({ title: "Cover image failed", description: e.message?.slice(0, 200), variant: "destructive" });
+      return null;
+    } finally { setImaging(null); }
+  };
 
   const suggest = async () => {
-    setLoadingIdeas(true); setError(null); setIdeas([]); setArticles({}); setDone({}); setPreview(null);
+    setLoadingIdeas(true); setError(null); setIdeas([]); setArticles({}); setImages({}); setDone({}); setPreview(null);
     const ctrl = new AbortController(); abortRef.current = ctrl;
     try {
       const r = await streamAiJson<{ ideas: Idea[] }>("blog-trending", { mode: "ideas" }, ctrl.signal);
@@ -49,10 +78,13 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
   };
 
   const write = async (i: number): Promise<Article | null> => {
-    if (articles[i]) return articles[i];
-    setWriting(i); setError(null);
+    if (articles[i] && (!withImage || images[i]?.final)) return articles[i];
+    setError(null);
     const ctrl = new AbortController(); abortRef.current = ctrl;
     try {
+      if (withImage && !images[i]?.final) await makeImage(i, ctrl.signal);
+      if (articles[i]) return articles[i];
+      setWriting(i);
       const a = await streamAiJson<Article>("blog-trending", { mode: "article", ...ideas[i] }, ctrl.signal);
       setArticles((s) => ({ ...s, [i]: a }));
       return a;
@@ -70,10 +102,18 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
       const idea = ideas[i];
       const content = DOMPurify.sanitize(a.content_html);
       const now = new Date().toISOString();
+      let coverUrl: string | null = null;
+      const img = images[i];
+      if (withImage && img?.final) {
+        const blob = await (await fetch(img.src)).blob();
+        coverUrl = await uploadBlogImage(new File([blob], "cover.png", { type: "image/png" }));
+      }
       const { data, error } = await (supabase as any).from("blog_posts").insert({
         title: a.title.trim(),
         slug: `${slugify(a.title)}-${Date.now().toString(36).slice(-4)}`,
         excerpt: a.excerpt.trim(),
+        cover_image_url: coverUrl,
+        cover_image_alt: coverUrl ? a.title.trim() : null,
         content,
         category: idea.category || "dental-tips",
         is_published: publish,
@@ -104,7 +144,7 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
     } finally { setSaving(null); }
   };
 
-  const busy = loadingIdeas || writing !== null || saving !== null;
+  const busy = loadingIdeas || writing !== null || saving !== null || imaging !== null;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) abortRef.current?.abort(); onOpenChange(v); }}>
@@ -121,6 +161,13 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
           {loadingIdeas ? "Finding trending topics…" : ideas.length ? "Suggest new topics" : "Suggest trending topics"}
         </Button>
 
+        <div className="flex items-center gap-2">
+          <Checkbox id="ai-cover" checked={withImage} onCheckedChange={(v) => setWithImage(v === true)} disabled={busy} />
+          <Label htmlFor="ai-cover" className="flex items-center gap-1 text-sm font-normal cursor-pointer">
+            <ImageIcon className="w-4 h-4" />Also generate a cover image
+          </Label>
+        </div>
+
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="space-y-3">
@@ -135,14 +182,18 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
                     <Badge variant="outline">{idea.focus_keyword}</Badge>
                     {state && <Badge className="gap-1"><Check className="w-3 h-3" />{state === "published" ? "Live" : "Draft saved"}</Badge>}
                   </div>
+                  {images[i] && (
+                    <img src={images[i].src} alt={idea.title}
+                      className={`w-full aspect-[3/2] object-cover rounded-md transition-all duration-500 ${images[i].final ? "" : "blur-md"}`} />
+                  )}
                   <h3 className="font-heading font-semibold">{idea.title}</h3>
                   <p className="text-sm text-muted-foreground">{idea.angle}</p>
                   <p className="text-xs text-muted-foreground"><span className="font-medium">Why now:</span> {idea.why_trending}</p>
                   {!state && (
                     <div className="flex flex-wrap gap-2 pt-1">
                       <Button size="sm" variant="hero" disabled={busy} onClick={() => save(i, true)}>
-                        {writing === i || saving === i ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Rocket className="w-3 h-3 mr-1" />}
-                        {writing === i ? "Writing article…" : saving === i ? "Publishing…" : "Write & publish"}
+                        {writing === i || saving === i || imaging === i ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Rocket className="w-3 h-3 mr-1" />}
+                        {imaging === i ? "Creating image…" : writing === i ? "Writing article…" : saving === i ? "Publishing…" : "Write & publish"}
                       </Button>
                       <Button size="sm" variant="outline" disabled={busy} onClick={() => save(i, false)}>
                         <FileText className="w-3 h-3 mr-1" />Save as draft
