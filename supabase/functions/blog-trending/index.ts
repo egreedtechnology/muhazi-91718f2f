@@ -82,10 +82,42 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null);
     const mode = body?.mode;
-    if (mode !== "ideas" && mode !== "article") return json({ error: "Unknown mode" }, 400);
+    if (mode !== "ideas" && mode !== "article" && mode !== "image") return json({ error: "Unknown mode" }, 400);
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) return json({ error: "AI is not configured" }, 500);
+
+    if (mode === "image") {
+      const title = str(body?.title, 200);
+      if (!title) return json({ error: "Missing idea title" }, 400);
+      const stream = body?.stream !== false;
+      const prompt = `Editorial blog cover photo for a dental clinic article titled "${title}". ${str(body?.angle, 300)}
+Warm, clean, professional, natural light, friendly East African patients or dental care scene, modern clinic setting, wide landscape composition. No text, no logos, no watermarks, no blood, no graphic medical imagery.`;
+      const upstream = await fetch("https://ai.gateway.lovable.dev/v1/images/generations", {
+        method: "POST",
+        signal: req.signal,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "openai/gpt-image-2.5-sunburst",
+          prompt,
+          size: "1536x1024",
+          ...(stream ? { stream: true, partial_images: 1 } : {}),
+        }),
+      });
+      if (!upstream.ok) {
+        const detail = await upstream.text();
+        console.error(`Image gateway failed [${upstream.status}]: ${detail}`);
+        let message = "Image generation failed";
+        try { const p = JSON.parse(detail); message = p?.error?.message || p?.message || message; } catch { /* text */ }
+        if (upstream.status === 429) message = "AI is busy right now. Please try again in a minute.";
+        if (upstream.status === 402) message = "AI credits are used up. Add credits in workspace settings.";
+        return json({ error: message }, upstream.status);
+      }
+      return new Response(upstream.body, {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": upstream.headers.get("Content-Type") ?? "text/event-stream", "Cache-Control": "no-cache" },
+      });
+    }
 
     let userPrompt: string;
     let schema: unknown;
