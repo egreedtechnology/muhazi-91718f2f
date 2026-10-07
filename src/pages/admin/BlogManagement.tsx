@@ -31,6 +31,8 @@ import RichEditor, { uploadBlogImage } from "@/components/admin/blog/RichEditor"
 import AiAssistant from "@/components/admin/blog/AiAssistant";
 import SeoPanel from "@/components/admin/blog/SeoPanel";
 import SocialCaptionsDialog from "@/components/admin/blog/SocialCaptionsDialog";
+import TrendingPostsDialog from "@/components/admin/blog/TrendingPostsDialog";
+import { TrendingUp } from "lucide-react";
 
 interface Faq { question: string; answer: string }
 
@@ -96,6 +98,7 @@ export default function BlogManagement() {
   const [saving, setSaving] = useState(false);
   const [fullScreen, setFullScreen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
+  const [trendingOpen, setTrendingOpen] = useState(false);
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [autoSaving, setAutoSaving] = useState(false);
@@ -440,7 +443,10 @@ export default function BlogManagement() {
             <h1 className="text-2xl font-heading font-bold">Blog Studio</h1>
             <p className="text-muted-foreground">Write, review and publish medical articles with built-in SEO.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setTrendingOpen(true)}>
+              <TrendingUp className="w-4 h-4 mr-2" />AI trending posts
+            </Button>
             <Button variant="outline" onClick={() => setSocialOpen(true)}>
               <Sparkles className="w-4 h-4 mr-2" />Social captions
             </Button>
@@ -449,6 +455,7 @@ export default function BlogManagement() {
             </Button>
           </div>
         </div>
+        <TrendingPostsDialog open={trendingOpen} onOpenChange={setTrendingOpen} onCreated={fetchPosts} />
         <SocialCaptionsDialog open={socialOpen} onOpenChange={setSocialOpen} posts={posts} />
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
