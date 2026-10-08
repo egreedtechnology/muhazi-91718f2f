@@ -5,14 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Megaphone, ClipboardCopy, Square } from "lucide-react";
+import { Loader2, Megaphone, ClipboardCopy, Square, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  posts: { id: string; title: string; is_published: boolean }[];
+  posts: { id: string; title: string; slug: string; is_published: boolean; cover_image_url?: string | null }[];
 }
 
 type Caption = { platform: string; text: string };
@@ -82,6 +82,33 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
     }
   };
 
+  const post = published.find((p) => p.id === postId);
+  const articleUrl = post ? `https://muhazi.lovable.app/blog/${post.slug}` : "";
+
+  const share = async (c: Caption) => {
+    const name = c.platform.toLowerCase();
+    const u = encodeURIComponent(articleUrl);
+    const t = encodeURIComponent(c.text);
+    let url = "";
+    if (name.includes("facebook")) {
+      url = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+      await navigator.clipboard.writeText(c.text).catch(() => {});
+      toast({ title: "Caption copied", description: "Paste it into the Facebook post box." });
+    } else if (name.includes("linkedin")) {
+      url = `https://www.linkedin.com/feed/?shareActive=true&text=${t}`;
+    } else if (name === "x" || name.includes("twitter")) {
+      url = `https://x.com/intent/post?text=${t}`;
+    } else if (name.includes("whatsapp")) {
+      url = `https://wa.me/?text=${t}`;
+    } else if (name.includes("instagram")) {
+      await navigator.clipboard.writeText(c.text).catch(() => {});
+      if (post?.cover_image_url) window.open(post.cover_image_url, "_blank", "noopener");
+      toast({ title: "Caption copied for Instagram", description: "Instagram has no web posting. Save the cover image, then post it in the Instagram app and paste the caption." });
+      return;
+    }
+    if (url) window.open(url, "_blank", "noopener,noreferrer,width=680,height=640");
+  };
+
   const copy = (t: string) => {
     navigator.clipboard.writeText(t);
     toast({ title: "Caption copied" });
@@ -134,7 +161,10 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
               <CardContent className="p-3 space-y-2">
                 <div className="flex items-center justify-between">
                   <Badge variant="secondary">{c.platform}</Badge>
-                  <Button size="sm" variant="ghost" onClick={() => copy(c.text)}><ClipboardCopy className="w-3 h-3 mr-1" />Copy</Button>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="ghost" onClick={() => copy(c.text)}><ClipboardCopy className="w-3 h-3 mr-1" />Copy</Button>
+                    <Button size="sm" onClick={() => share(c)}><Share2 className="w-3 h-3 mr-1" />{c.platform.toLowerCase().includes("instagram") ? "Prepare post" : `Post to ${c.platform}`}</Button>
+                  </div>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{c.text}</p>
               </CardContent>
