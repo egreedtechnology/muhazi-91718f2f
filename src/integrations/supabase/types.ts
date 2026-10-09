@@ -870,6 +870,48 @@ export type Database = {
           },
         ]
       }
+      patient_reviews: {
+        Row: {
+          appointment_id: string | null
+          created_at: string
+          feedback: string | null
+          id: string
+          patient_account_id: string
+          rating: number
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_account_id: string
+          rating: number
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          patient_account_id?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_reviews_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_reviews_patient_account_id_fkey"
+            columns: ["patient_account_id"]
+            isOneToOne: false
+            referencedRelation: "patient_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           address: string | null

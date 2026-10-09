@@ -83,7 +83,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
   };
 
   const post = published.find((p) => p.id === postId);
-  const articleUrl = post ? `https://muhazi.lovable.app/blog/${post.slug}` : "";
+  const articleUrl = post ? `https://muhazidentalclinic.org/blog/${post.slug}` : "";
 
   const share = async (c: Caption) => {
     const name = c.platform.toLowerCase();
@@ -102,11 +102,29 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
       url = `https://wa.me/?text=${t}`;
     } else if (name.includes("instagram")) {
       await navigator.clipboard.writeText(c.text).catch(() => {});
-      if (post?.cover_image_url) window.open(post.cover_image_url, "_blank", "noopener");
-      toast({ title: "Caption copied for Instagram", description: "Instagram has no web posting. Save the cover image, then post it in the Instagram app and paste the caption." });
+      // On phones: native share sheet sends image + caption straight into the Instagram app.
+      try {
+        if (post?.cover_image_url && navigator.share) {
+          const blob = await (await fetch(post.cover_image_url)).blob();
+          const file = new File([blob], `${post.slug}.${blob.type.split("/")[1] || "jpg"}`, { type: blob.type });
+          if (navigator.canShare?.({ files: [file] })) {
+            await navigator.share({ files: [file], text: c.text, title: post.title });
+            return;
+          }
+        }
+      } catch (e: any) { if (e?.name === "AbortError") return; }
+      // Desktop: open Instagram's create page in a real new tab (not embedded, which Instagram blocks).
+      openTab("https://www.instagram.com/create/select/");
+      toast({ title: "Caption copied for Instagram", description: "Upload the cover image in Instagram, then paste the caption (Ctrl+V)." });
       return;
     }
-    if (url) window.open(url, "_blank", "noopener,noreferrer,width=680,height=640");
+    if (url) openTab(url);
+  };
+
+  const openTab = (href: string) => {
+    const a = document.createElement("a");
+    a.href = href; a.target = "_blank"; a.rel = "noopener noreferrer";
+    document.body.appendChild(a); a.click(); a.remove();
   };
 
   const copy = (t: string) => {

@@ -747,7 +747,7 @@ export default function BlogManagement() {
 
                     <div className="rounded-lg border p-4 space-y-1">
                       <p className="text-xs uppercase tracking-wide text-muted-foreground">Google preview</p>
-                      <p className="text-xs text-green-700">muhazi.lovable.app › blog › {form.slug || slugify(form.title) || "your-article"}</p>
+                      <p className="text-xs text-green-700">muhazidentalclinic.org › blog › {form.slug || slugify(form.title) || "your-article"}</p>
                       <p className="text-[#1a0dab] text-lg leading-snug">{form.meta_title || buildMetaTitle(form.title || "Untitled")}</p>
                       <p className="text-sm text-muted-foreground">{form.meta_description || form.excerpt || buildExcerpt(form.content)}</p>
                     </div>

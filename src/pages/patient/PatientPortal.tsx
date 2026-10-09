@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PatientReviews from "@/components/patient/PatientReviews";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -393,6 +394,7 @@ const PatientPortal = () => {
               <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="requests">Requests</TabsTrigger>
               <TabsTrigger value="messages">Messages</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews</TabsTrigger>
               <TabsTrigger value="history">History</TabsTrigger>
               <TabsTrigger value="records">Medical Records</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -664,6 +666,10 @@ const PatientPortal = () => {
 
             <TabsContent value="messages">
               <PatientInbox patientAccountId={patientAccount.id} appointments={appointments} />
+            </TabsContent>
+
+            <TabsContent value="reviews">
+              <PatientReviews patientAccountId={patientAccount.id} appointments={appointments as any} />
             </TabsContent>
 
             <TabsContent value="profile">

@@ -14,7 +14,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-lovable-aig-run-id",
 };
 
-const SITE = "https://muhazi.lovable.app";
+const SITE = "https://muhazidentalclinic.org";
 
 const SYSTEM = `You are the social media writer for Muhazi Dental Clinic in Rwamagana, Rwanda.
 Write warm, plain-language, patient-friendly captions that promote a published blog article.
