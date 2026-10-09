@@ -21,7 +21,7 @@ function Stars({ value, onChange, size = 6 }: { value: number; onChange?: (n: nu
     <div className="flex gap-1" role={onChange ? "radiogroup" : undefined} aria-label="Rating">
       {[1, 2, 3, 4, 5].map((n) => (
         <button key={n} type="button" disabled={!onChange} onClick={() => onChange?.(n)} aria-label={`${n} star${n > 1 ? "s" : ""}`}>
-          <Star className={`w-${size} h-${size} ${n <= value ? "fill-secondary text-secondary" : "text-muted-foreground"}`} />
+          <Star className={`${size >= 8 ? "w-8 h-8" : size >= 6 ? "w-6 h-6" : "w-4 h-4"} ${n <= value ? "fill-secondary text-secondary" : "text-muted-foreground"}`} />
         </button>
       ))}
     </div>
