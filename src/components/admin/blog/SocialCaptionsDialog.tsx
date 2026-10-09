@@ -25,6 +25,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
   const [busy, setBusy] = useState(false);
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [igBusy, setIgBusy] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
   const generate = async () => {
@@ -101,21 +102,26 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
     } else if (name.includes("whatsapp")) {
       url = `https://wa.me/?text=${t}`;
     } else if (name.includes("instagram")) {
-      await navigator.clipboard.writeText(c.text).catch(() => {});
-      // On phones: native share sheet sends image + caption straight into the Instagram app.
+      if (!post) return;
+      if (!post.cover_image_url) {
+        toast({ title: "Cover image needed", description: "Add a cover image to this article first.", variant: "destructive" });
+        return;
+      }
+      setIgBusy(true);
       try {
-        if (post?.cover_image_url && navigator.share) {
-          const blob = await (await fetch(post.cover_image_url)).blob();
-          const file = new File([blob], `${post.slug}.${blob.type.split("/")[1] || "jpg"}`, { type: blob.type });
-          if (navigator.canShare?.({ files: [file] })) {
-            await navigator.share({ files: [file], text: c.text, title: post.title });
-            return;
-          }
+        const { data, error } = await supabase.functions.invoke("instagram-post", { body: { postId: post.id, caption: c.text } });
+        if (error) {
+          const j = await (error as any).context?.json?.().catch(() => null);
+          throw new Error(j?.error || error.message);
         }
-      } catch (e: any) { if (e?.name === "AbortError") return; }
-      // Desktop: open Instagram's create page in a real new tab (not embedded, which Instagram blocks).
-      openTab("https://www.instagram.com/create/select/");
-      toast({ title: "Caption copied for Instagram", description: "Upload the cover image in Instagram, then paste the caption (Ctrl+V)." });
+        if (data?.error) throw new Error(data.error);
+        toast({ title: "Posted to Instagram", description: "The cover photo and caption are now live." });
+        if (data?.permalink) openTab(data.permalink);
+      } catch (e: any) {
+        toast({ title: "Instagram post failed", description: e.message, variant: "destructive" });
+      } finally {
+        setIgBusy(false);
+      }
       return;
     }
     if (url) openTab(url);
@@ -181,7 +187,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
                   <Badge variant="secondary">{c.platform}</Badge>
                   <div className="flex gap-1">
                     <Button size="sm" variant="ghost" onClick={() => copy(c.text)}><ClipboardCopy className="w-3 h-3 mr-1" />Copy</Button>
-                    <Button size="sm" onClick={() => share(c)}><Share2 className="w-3 h-3 mr-1" />{c.platform.toLowerCase().includes("instagram") ? "Prepare post" : `Post to ${c.platform}`}</Button>
+                    <Button size="sm" disabled={igBusy && c.platform.toLowerCase().includes("instagram")} onClick={() => share(c)}>{igBusy && c.platform.toLowerCase().includes("instagram") ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}Post to {c.platform}</Button>
                   </div>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{c.text}</p>
