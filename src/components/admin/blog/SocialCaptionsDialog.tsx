@@ -83,7 +83,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
   };
 
   const post = published.find((p) => p.id === postId);
-  const articleUrl = post ? `https://muhazi.lovable.app/blog/${post.slug}` : "";
+  const articleUrl = post ? `https://muhazidentalclinic.org/blog/${post.slug}` : "";
 
   const share = async (c: Caption) => {
     const name = c.platform.toLowerCase();

@@ -98,9 +98,9 @@ var clinic_info_default = defineTool4({
       name: "Muhazi Dental Clinic",
       location: "Rwamagana, Rwanda",
       phone: "+250 787 630 399",
-      website: "https://muhazi.lovable.app",
+      website: "https://muhazidentalclinic.org",
       hours: "Open daily 8:00 AM \u2013 8:00 PM",
-      booking_url: "https://muhazi.lovable.app/book",
+      booking_url: "https://muhazidentalclinic.org/book",
       languages: ["English", "Kinyarwanda", "French"]
     };
     return {
