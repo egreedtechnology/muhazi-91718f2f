@@ -9,7 +9,9 @@ import {
   MapPin, 
   Clock, 
   MessageCircle,
-  Send
+  Send,
+  Facebook,
+  Instagram
 } from "lucide-react";
 import PublicLayout from "@/components/layout/PublicLayout";
 import SEOHead from "@/components/seo/SEOHead";
