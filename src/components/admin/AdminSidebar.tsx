@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
   LayoutDashboard,
+  Star,
   Calendar,
   CalendarDays,
   Users,
@@ -41,6 +42,7 @@ const sections: { label: string; items: { icon: any; label: string; path: string
     items: [
       { icon: Users, label: "Patients", path: "/admin/patients", roles: ["super_admin", "receptionist", "dentist"] },
       { icon: MessageSquare, label: "Inbox", path: "/admin/messages", roles: ["super_admin", "receptionist"] },
+      { icon: Star, label: "Reviews", path: "/admin/reviews", roles: ["super_admin", "receptionist", "dentist", "manager"] },
       { icon: UserCircle, label: "Team profiles", path: "/admin/staff", roles: ["super_admin", "manager"] },
       // Temporarily hidden: { icon: UserCog, label: "Staff accounts", path: "/admin/staff-accounts", roles: ["super_admin", "manager"] },
     ],

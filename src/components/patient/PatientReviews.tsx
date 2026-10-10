@@ -108,6 +108,12 @@ export default function PatientReviews({ patientAccountId, appointments }: Props
                   <Stars value={r.rating} size={4} />
                   <p className="text-xs text-muted-foreground">{label(r.appointment_id)} · {format(new Date(r.created_at), "PP")}</p>
                   {r.feedback && <p className="text-sm">{r.feedback}</p>}
+                  {(r as any).staff_reply && (
+                    <div className="border-l-4 border-primary bg-muted rounded-r p-2 text-sm">
+                      <p className="font-semibold text-primary text-xs">Clinic reply</p>
+                      <p>{(r as any).staff_reply}</p>
+                    </div>
+                  )}
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => remove(r.id)} aria-label="Delete review"><Trash2 className="w-4 h-4" /></Button>
               </div>
