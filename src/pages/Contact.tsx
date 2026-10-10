@@ -47,6 +47,20 @@ const contactInfo = [
     href: "https://maps.google.com/?q=Rwamagana,Rwanda",
     description: "Visit our clinic",
   },
+  {
+    icon: Facebook,
+    title: "Facebook",
+    content: "Muhazi Dental Clinic",
+    href: "https://web.facebook.com/profile.php?id=61583306890085",
+    description: "Follow us on Facebook",
+  },
+  {
+    icon: Instagram,
+    title: "Instagram",
+    content: "@muhazi_dental",
+    href: "https://www.instagram.com/muhazi_dental/",
+    description: "Follow us on Instagram",
+  },
 ];
 
 const Contact = () => {
