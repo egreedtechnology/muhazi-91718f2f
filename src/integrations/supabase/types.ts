@@ -876,24 +876,36 @@ export type Database = {
           created_at: string
           feedback: string | null
           id: string
+          is_public: boolean
           patient_account_id: string
           rating: number
+          replied_at: string | null
+          replied_by: string | null
+          staff_reply: string | null
         }
         Insert: {
           appointment_id?: string | null
           created_at?: string
           feedback?: string | null
           id?: string
+          is_public?: boolean
           patient_account_id: string
           rating: number
+          replied_at?: string | null
+          replied_by?: string | null
+          staff_reply?: string | null
         }
         Update: {
           appointment_id?: string | null
           created_at?: string
           feedback?: string | null
           id?: string
+          is_public?: boolean
           patient_account_id?: string
           rating?: number
+          replied_at?: string | null
+          replied_by?: string | null
+          staff_reply?: string | null
         }
         Relationships: [
           {
@@ -1313,6 +1325,17 @@ export type Database = {
       }
     }
     Functions: {
+      get_public_reviews: {
+        Args: { _limit?: number }
+        Returns: {
+          created_at: string
+          feedback: string
+          first_name: string
+          id: string
+          rating: number
+          staff_reply: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

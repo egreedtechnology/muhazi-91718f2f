@@ -39,6 +39,8 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import SetPassword from "./pages/auth/SetPassword";
 import Connect from "./pages/Connect";
+import PublicReviews from "./pages/Reviews";
+import AdminReviews from "./pages/admin/Reviews";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +65,7 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             <Route path="/connect" element={<Connect />} />
+            <Route path="/reviews" element={<PublicReviews />} />
             <Route path="/set-password" element={<SetPassword />} />
             <Route path="/auth/callback" element={<SetPassword />} />
             
@@ -150,6 +153,14 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={["super_admin", "receptionist"]}>
                   <Messages />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reviews"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin", "receptionist", "dentist", "manager"]}>
+                  <AdminReviews />
                 </ProtectedRoute>
               }
             />
