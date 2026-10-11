@@ -50,9 +50,14 @@ Deno.serve(async (req) => {
     if (!post.is_published) return json({ error: "Only published articles can be posted" }, 400);
     if (!post.cover_image_url?.startsWith("https://")) return json({ error: "This article needs a cover image first" }, 400);
 
-    const token = Deno.env.get("INSTAGRAM_ACCESS_TOKEN");
-    const igUser = Deno.env.get("INSTAGRAM_USER_ID");
-    if (!token || !igUser) return json({ error: "Instagram is not connected yet" }, 500);
+    let token = Deno.env.get("INSTAGRAM_ACCESS_TOKEN");
+    let igUser = Deno.env.get("INSTAGRAM_USER_ID");
+    if (!token || !igUser) {
+      const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { data: t } = await admin.from("social_tokens").select("access_token, external_id").eq("platform", "instagram").maybeSingle();
+      token = t?.access_token; igUser = t?.external_id ?? undefined;
+    }
+    if (!token || !igUser) return json({ error: "Instagram is not connected yet — use Social Hub → Connect with Meta" }, 500);
 
     // 1) create media container
     const container = await graph(`${igUser}/media`, { image_url: post.cover_image_url, caption, access_token: token });

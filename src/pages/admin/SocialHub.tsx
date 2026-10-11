@@ -113,7 +113,33 @@ const SocialHub = () => {
     const { data: l } = await supabase.from("activity_logs").select("*").or("action.ilike.%instagram%,action.ilike.%social%").order("created_at", { ascending: false }).limit(50);
     setLogs(l ?? []);
   };
-  useEffect(() => { load(); }, []);
+  const { toast } = useToast();
+  const [connecting, setConnecting] = useState(false);
+  const params = new URLSearchParams(window.location.search);
+  const metaResult = params.get("meta");
+
+  useEffect(() => {
+    load();
+    if (metaResult) {
+      const msg = params.get("msg") ?? "";
+      toast(metaResult === "connected"
+        ? { title: "Meta accounts connected", description: msg.replace(/,/g, ", ") }
+        : { title: "Meta connection failed", description: msg, variant: "destructive" });
+      window.history.replaceState({}, "", "/admin/social-hub");
+    }
+  }, []);
+
+  const connectMeta = async () => {
+    setConnecting(true);
+    const { data, error } = await supabase.functions.invoke("meta-connect", { body: { action: "start", origin: window.location.origin } });
+    if (error || !data?.url) {
+      setConnecting(false);
+      let msg = error?.message ?? "Could not start Meta sign-in";
+      try { msg = (await (error as any)?.context?.json())?.error ?? msg; } catch { /* ignore */ }
+      return toast({ title: "Could not connect", description: msg, variant: "destructive" });
+    }
+    window.location.href = data.url;
+  };
 
   const connected = conns.filter((c) => c.status === "connected").length;
 
@@ -124,7 +150,7 @@ const SocialHub = () => {
           <h1 className="text-2xl font-bold">Social Hub</h1>
           <p className="text-muted-foreground">Manage the clinic's social accounts in one place.</p>
         </div>
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue={metaResult ? "connections" : "overview"}>
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="overview"><LayoutGrid className="w-4 h-4 mr-1" />Overview</TabsTrigger>
             <TabsTrigger value="inbox"><Inbox className="w-4 h-4 mr-1" />Inbox</TabsTrigger>
@@ -154,7 +180,16 @@ const SocialHub = () => {
           <TabsContent value="calendar"><Soon icon={CalendarDays} title="Content calendar — next phase" text="Scheduled social posts will show here." /></TabsContent>
 
           <TabsContent value="connections" className="space-y-4">
-            {conns.map((c) => <ConnectionCard key={c.id} c={c} onSaved={load} />)}
+            <Card><CardContent className="pt-6 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-medium">Connect Facebook, Instagram & WhatsApp</p>
+                <p className="text-sm text-muted-foreground">One Meta sign-in links all three. Choose the clinic's Page, Instagram and WhatsApp number when asked.</p>
+              </div>
+              <Button onClick={connectMeta} disabled={connecting}>
+                <Facebook className="w-4 h-4 mr-2" />{connecting ? "Opening Meta…" : "Connect with Meta"}
+              </Button>
+            </CardContent></Card>
+            {conns.map((c) => <ConnectionCard key={c.id + c.updated_at} c={c} onSaved={load} />)}
           </TabsContent>
 
           <TabsContent value="logs">
