@@ -41,6 +41,7 @@ import SetPassword from "./pages/auth/SetPassword";
 import Connect from "./pages/Connect";
 import PublicReviews from "./pages/Reviews";
 import AdminReviews from "./pages/admin/Reviews";
+import SocialHub from "./pages/admin/SocialHub";
 
 const queryClient = new QueryClient();
 
@@ -164,6 +165,15 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/social-hub"
+              element={
+                <ProtectedRoute allowedRoles={["super_admin", "manager", "receptionist"]}>
+                  <SocialHub />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin/blog"
               element={
