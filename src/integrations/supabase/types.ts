@@ -1115,6 +1115,51 @@ export type Database = {
         }
         Relationships: []
       }
+      social_connections: {
+        Row: {
+          account_id: string | null
+          account_name: string | null
+          created_at: string
+          id: string
+          last_checked_at: string | null
+          notes: string | null
+          page_id: string | null
+          platform: string
+          scopes: string[]
+          status: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          account_id?: string | null
+          account_name?: string | null
+          created_at?: string
+          id?: string
+          last_checked_at?: string | null
+          notes?: string | null
+          page_id?: string | null
+          platform: string
+          scopes?: string[]
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          account_id?: string | null
+          account_name?: string | null
+          created_at?: string
+          id?: string
+          last_checked_at?: string | null
+          notes?: string | null
+          page_id?: string | null
+          platform?: string
+          scopes?: string[]
+          status?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       staff: {
         Row: {
           avatar_url: string | null
