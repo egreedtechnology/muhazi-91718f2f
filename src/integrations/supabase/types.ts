@@ -1160,6 +1160,30 @@ export type Database = {
         }
         Relationships: []
       }
+      social_tokens: {
+        Row: {
+          access_token: string
+          expires_at: string | null
+          external_id: string | null
+          platform: string
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          expires_at?: string | null
+          external_id?: string | null
+          platform: string
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          expires_at?: string | null
+          external_id?: string | null
+          platform?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       staff: {
         Row: {
           avatar_url: string | null
