@@ -56,6 +56,35 @@ Deno.serve(async (req) => {
     ]);
     if (!a && !m) return json({ error: "Only administrators or managers can connect accounts" }, 403);
     const body = await req.json().catch(() => ({}));
+    if (body?.action === "manual_token") {
+      const token = typeof body.token === "string" ? body.token.trim() : "";
+      if (token.length < 20 || token.length > 2000) return json({ error: "Paste a valid Page access token" }, 400);
+      try {
+        // Exchange for a long-lived token when possible (page tokens from a long-lived user token never expire)
+        let finalToken = token;
+        try {
+          const ex = await g("oauth/access_token", { grant_type: "fb_exchange_token", client_id: APP_ID, client_secret: APP_SECRET, fb_exchange_token: token });
+          if (ex.access_token) finalToken = ex.access_token;
+        } catch { /* keep original */ }
+        const me = await g("me", { fields: "id,name,instagram_business_account{id,username}", access_token: finalToken });
+        if (!me.instagram_business_account && !me.name) throw new Error("Token not recognised");
+        const admin = createClient(SB_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+        const now = new Date().toISOString();
+        const connected: string[] = ["Facebook"];
+        await admin.from("social_tokens").upsert({ platform: "facebook", access_token: finalToken, external_id: me.id, updated_at: now });
+        await admin.from("social_connections").update({ status: "connected", account_name: me.name, page_id: me.id, account_id: me.id, last_checked_at: now, updated_by: u.user.id }).eq("platform", "facebook");
+        const ig = me.instagram_business_account;
+        if (ig?.id) {
+          connected.push("Instagram");
+          await admin.from("social_tokens").upsert({ platform: "instagram", access_token: finalToken, external_id: ig.id, updated_at: now });
+          await admin.from("social_connections").update({ status: "connected", account_name: ig.username ?? me.name, account_id: ig.id, page_id: me.id, last_checked_at: now, updated_by: u.user.id }).eq("platform", "instagram");
+        }
+        await admin.from("activity_logs").insert({ user_id: u.user.id, action: "social.manual_token_saved", entity_type: "social_connection", details: { page: me.name, instagram: ig?.username ?? null } });
+        return json({ ok: true, page: me.name, connected });
+      } catch (e) {
+        return json({ error: `Meta rejected this token: ${(e as Error).message}` }, 400);
+      }
+    }
     const origin = typeof body?.origin === "string" && ALLOWED_ORIGIN.test(body.origin) ? body.origin : "https://muhazidentalclinic.org";
     const payload = b64url(enc.encode(JSON.stringify({ uid: u.user.id, origin, exp: Date.now() + 10 * 60_000 })));
     const state = `${payload}.${await sign(payload)}`;

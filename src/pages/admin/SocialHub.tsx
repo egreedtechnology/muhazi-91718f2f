@@ -189,6 +189,7 @@ const SocialHub = () => {
                 <Facebook className="w-4 h-4 mr-2" />{connecting ? "Opening Meta…" : "Connect with Meta"}
               </Button>
             </CardContent></Card>
+            <ManualTokenCard onSaved={load} />
             {conns.map((c) => <ConnectionCard key={c.id + c.updated_at} c={c} onSaved={load} />)}
           </TabsContent>
 
