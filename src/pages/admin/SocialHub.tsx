@@ -189,6 +189,7 @@ const SocialHub = () => {
                 <Facebook className="w-4 h-4 mr-2" />{connecting ? "Opening Meta…" : "Connect with Meta"}
               </Button>
             </CardContent></Card>
+            <ManualTokenCard onSaved={load} />
             {conns.map((c) => <ConnectionCard key={c.id + c.updated_at} c={c} onSaved={load} />)}
           </TabsContent>
 
@@ -213,3 +214,34 @@ const SocialHub = () => {
 };
 
 export default SocialHub;
+
+function ManualTokenCard({ onSaved }: { onSaved: () => void }) {
+  const { toast } = useToast();
+  const [token, setToken] = useState("");
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    setSaving(true);
+    const { data, error } = await supabase.functions.invoke("meta-connect", { body: { action: "manual_token", token } });
+    setSaving(false);
+    if (error || !data?.ok) {
+      let msg = error?.message ?? "Could not save token";
+      try { msg = (await (error as any)?.context?.json())?.error ?? msg; } catch { /* ignore */ }
+      return toast({ title: "Token not saved", description: msg, variant: "destructive" });
+    }
+    setToken("");
+    toast({ title: "Connected", description: `${data.page}: ${data.connected.join(" + ")} ready for posting.` });
+    onSaved();
+  };
+  return (
+    <Card><CardContent className="pt-6 space-y-3">
+      <div>
+        <p className="font-medium">Paste a Page access token</p>
+        <p className="text-sm text-muted-foreground">From Meta Graph API Explorer: pick the clinic Page, add pages_show_list, pages_read_engagement, pages_manage_posts, then Generate Access Token. It is stored securely and never shown again.</p>
+      </div>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <Input type="password" autoComplete="off" placeholder="EAAG…" value={token} onChange={(e) => setToken(e.target.value)} />
+        <Button onClick={save} disabled={saving || token.trim().length < 20}>{saving ? "Checking…" : "Save token"}</Button>
+      </div>
+    </CardContent></Card>
+  );
+}
