@@ -38,8 +38,8 @@ const contactInfo = [
   {
     icon: Mail,
     title: "Email",
-    content: "info@muhazidental.rw",
-    href: "mailto:info@muhazidental.rw",
+    content: "muhazidentalclinic@gmail.com",
+    href: "mailto:muhazidentalclinic@gmail.com",
     description: "Send us an email",
   },
   {
@@ -139,7 +139,7 @@ const Contact = () => {
     <PublicLayout>
       <SEOHead 
         title="Contact Muhazi Dental Clinic — Rwamagana, Rwanda"
-        description="Call +250 787 630 399, WhatsApp, or visit us at 2nd Floor above MTN Branch in Rwamagana. Open 7 days, 8AM–8PM. Email info@muhazidentalclinic.org."
+        description="Call +250 787 630 399, WhatsApp, or visit us at 2nd Floor above MTN Branch in Rwamagana. Open 7 days, 8AM–8PM. Email muhazidentalclinic@gmail.com."
         canonical="/contact"
         keywords="contact Muhazi Dental, Rwamagana dentist contact, dental clinic phone Rwanda, clinic location Rwamagana, WhatsApp dentist, eGreed Technology"
         ogImageAlt="Contact Muhazi Dental Clinic in Rwamagana, Rwanda"
