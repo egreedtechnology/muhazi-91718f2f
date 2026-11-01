@@ -1575,7 +1575,6 @@ export type Database = {
       }
     }
     Functions: {
-      can_use_social_hub: { Args: { _user_id: string }; Returns: boolean }
       get_public_reviews: {
         Args: { _limit?: number }
         Returns: {
