@@ -1115,6 +1115,47 @@ export type Database = {
         }
         Relationships: []
       }
+      social_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          conversation_id: string | null
+          created_at: string
+          details: Json
+          event_key: string | null
+          id: string
+          platform: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          details?: Json
+          event_key?: string | null
+          id?: string
+          platform?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          conversation_id?: string | null
+          created_at?: string
+          details?: Json
+          event_key?: string | null
+          id?: string
+          platform?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_activity_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "social_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_connections: {
         Row: {
           account_id: string | null
@@ -1159,6 +1200,146 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      social_conversations: {
+        Row: {
+          account_id: string
+          created_at: string
+          external_thread_id: string
+          id: string
+          kind: string
+          last_event_at: string
+          last_inbound_at: string | null
+          participant_id: string | null
+          participant_name: string
+          platform: string
+          read_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          external_thread_id: string
+          id?: string
+          kind: string
+          last_event_at?: string
+          last_inbound_at?: string | null
+          participant_id?: string | null
+          participant_name?: string
+          platform: string
+          read_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          external_thread_id?: string
+          id?: string
+          kind?: string
+          last_event_at?: string
+          last_inbound_at?: string | null
+          participant_id?: string | null
+          participant_name?: string
+          platform?: string
+          read_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_delivery_state: {
+        Row: {
+          last_error: string | null
+          last_received_at: string | null
+          platform: string
+          subscribed_at: string | null
+          updated_at: string
+          verified_at: string | null
+        }
+        Insert: {
+          last_error?: string | null
+          last_received_at?: string | null
+          platform: string
+          subscribed_at?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Update: {
+          last_error?: string | null
+          last_received_at?: string | null
+          platform?: string
+          subscribed_at?: string | null
+          updated_at?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      social_messages: {
+        Row: {
+          attachments: Json
+          body: string
+          conversation_id: string
+          created_at: string
+          direction: string
+          external_id: string
+          id: string
+          is_deleted: boolean
+          kind: string
+          occurred_at: string
+          parent_id: string | null
+          platform: string
+          sender_id: string | null
+          sender_name: string | null
+          sent_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json
+          body?: string
+          conversation_id: string
+          created_at?: string
+          direction: string
+          external_id: string
+          id?: string
+          is_deleted?: boolean
+          kind: string
+          occurred_at?: string
+          parent_id?: string | null
+          platform: string
+          sender_id?: string | null
+          sender_name?: string | null
+          sent_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json
+          body?: string
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          external_id?: string
+          id?: string
+          is_deleted?: boolean
+          kind?: string
+          occurred_at?: string
+          parent_id?: string | null
+          platform?: string
+          sender_id?: string | null
+          sender_name?: string | null
+          sent_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "social_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_tokens: {
         Row: {
