@@ -1,80 +1,33 @@
-## Staff Account Management — Implementation Plan
+# Social Hub — Unified Inbox and Activity
 
-Replaces the "Enter User UUID" flow with a searchable, professional Staff Accounts page under Administration. Because Supabase's `auth.users` table is not accessible from the browser (anon key), all admin-only operations (list users, invite, reset password, suspend, delete) run through a secure **Edge Function** guarded by `is_staff` + `super_admin` role check.
+## What will change
+- Replace the Inbox placeholder with Facebook and Instagram conversations and post comments, keeping the existing pages and design unchanged.
+- Add platform, messages/comments, unread and search filters; show sender, timestamps, attachments, and conversation history.
+- Allow authorized Social Hub staff to mark items read, resolve/reopen conversations, and reply when Meta permits it. Show actual sending failures rather than reporting false success.
+- Upgrade Activity with platform/action filters, dated events, pagination and CSV export for social connection, incoming message/comment, reply and conversation-status events. Exclude tokens and private message bodies from audit details.
 
----
+## Connecting live delivery
+- Use the existing saved Facebook and Instagram tokens and Meta app credentials; validate account access and required permissions before enabling delivery.
+- Add a secure Meta callback for new Facebook/Instagram messages and comments, with challenge verification, signed-request validation and duplicate protection.
+- Provide administrator connection checks and subscribe the connected accounts to supported events. Any Meta Dashboard configuration or approval that cannot be completed from the app will be listed explicitly with the callback URL and required fields.
+- Treat existing chats as a separate history sync only where Meta grants access; do not imply webhooks automatically import old messages.
+- WhatsApp, post publishing and the content calendar are not part of this change.
 
-### 1. Database (migration)
+## Access and privacy
+- Restrict inbox access and replies to the Social Hub's existing super administrator, manager and receptionist roles, verified on the server. Reject suspended/disabled staff.
+- Keep social messages separate from patient clinical records. Browser users cannot read access tokens or write incoming messages/audit events directly.
+- Preserve provider event IDs and enforce idempotent processing so Meta retries do not duplicate messages or activity.
 
-Extend the existing `staff` table (source of truth for profiles) — keep it lean, no duplicate profile tables:
+## Technical implementation
+- Add dedicated social conversation, message/comment and social activity tables with explicit grants, RLS, indexes and server-only write permissions. Use consistent role checks without broadening the clinic-wide `is_staff` helper.
+- Add Supabase Edge Functions for the signed public Meta webhook and authenticated inbox actions/subscription checks. Reuse existing Meta app secrets and tokens server-side; generate a dedicated webhook verification secret.
+- Extract focused Inbox and Activity components from the existing Social Hub page. Load paginated data and refresh through subscriptions with cleanup where supported.
+- Record the social data boundary and authorization rules in `AGENTS.md`; track implementation and any external setup blockers in `roadmap.md`.
 
-- `department text` — e.g. "Clinical", "Administration", "IT"
-- `position text` — free-text job title
-- `status text` — enum-like: `active | pending | suspended | disabled` (default `pending`)
-- `last_login_at timestamptz`
-- `invited_at timestamptz`
-- `invited_by uuid`
+## Verification
+- Add and run tests for signature rejection, duplicate handling, Facebook/Instagram message and comment parsing, authorized roles and reply-window enforcement.
+- Check database grants/RLS and the latest page error reports.
+- Verify the signed-in inbox and activity screens and a real incoming-message/reply flow when the connected account permissions and Meta delivery configuration permit it. Report any unavailable authenticated or live-provider checks honestly.
 
-Extend `app_role` enum with additional roles:
-`manager`, `dental_assistant`, `it_admin`, `cashier`, `lab_technician`, `pharmacist`, `nurse`, `cleaner`, `security_guard`
-(keeps existing `super_admin`, `dentist`, `receptionist`, `accountant`)
-
-New helper: `has_any_role(_user_id, variadic app_role[])` for RBAC in RLS.
-
-Update `is_staff()` to include the new staff-side roles.
-
-RLS updates:
-- `staff` — managers + super_admins can insert/update/delete; all staff can select.
-- `user_roles` — only `super_admin` and `manager` can insert/update/delete.
-- `activity_logs` — already logs actions; add helper to insert from edge function.
-
-### 2. Edge function: `staff-admin`
-
-Single function with actions (POST body `{ action, payload }`), all authorized via JWT + super_admin/manager check using service-role client:
-
-- `search_users` — searches `auth.users` (via admin API) + `staff` by name/email/phone, returns unified results
-- `invite_staff` — `auth.admin.inviteUserByEmail`, then upsert into `staff` with `status='pending'`, create `user_roles` row
-- `assign_role` — insert/replace `user_roles` for a given `user_id`
-- `remove_role` — delete `user_roles` row
-- `set_status` — update `staff.status` (active/suspended/disabled)
-- `reset_password` — `auth.admin.generateLink({type:'recovery'})` → send email
-- `delete_staff` — remove `user_roles`, `staff`, and optionally the auth user
-- Each action writes to `activity_logs`.
-
-Uses `SUPABASE_SERVICE_ROLE_KEY` (already available). CORS handled.
-
-### 3. Frontend — new page `/admin/staff-accounts`
-
-Replaces (or complements) the current Staff Management. Route added to `App.tsx`, sidebar entry "Staff Accounts" under **System** (super_admin + manager only). Old `/admin/staff` remains for legacy team-profile editing.
-
-Components:
-
-- **StaffAccounts.tsx** — main page:
-  - Top filters chips: All / Dentists / Managers / Receptionists / IT / Active / Pending / Suspended
-  - Global search input (name, email, phone, role, department)
-  - Grid of staff cards (avatar with initials fallback, name, email, phone, department, role badge, colored status dot, last login)
-  - Actions per card: Edit • Assign Role • Suspend/Activate • Reset Password • Delete
-  - Pagination (20/page)
-  - Empty state
-- **InviteStaffDialog.tsx** — full name, email, phone, department, position, role select → calls `staff-admin/invite_staff`
-- **AssignRoleDialog.tsx** — searchable combobox (debounced, hits `staff-admin/search_users`), shows results with avatar/name/email/current role, role select, permissions preview panel, Cancel/Assign buttons
-- **StaffProfileDrawer.tsx** — click a card to open: profile info, working schedule, activity log (from `activity_logs`), assigned patients count, appointments count
-- **useStaffAdmin.ts** — hook wrapping `supabase.functions.invoke('staff-admin', ...)` with toast handling
-- **rolePermissions.ts** — static map of role → permissions[] used by AssignRoleDialog preview
-
-### 4. Security & UX
-
-- `ProtectedRoute allowedRoles={["super_admin","manager"]}` on the new page.
-- Confirm dialogs for Suspend / Delete / Reset Password.
-- Sonner toasts for success/error.
-- Loading skeletons and spinner states on all async ops.
-- Never displays raw UUIDs.
-
-### 5. Out of scope (call out to user)
-
-- Custom-role builder UI (adding brand-new role strings at runtime) — the enum is DB-typed; adding roles requires a migration. Plan ships with the expanded fixed list above; a future "Add custom role" would need dynamic role table instead of enum. If you want that instead, say the word and I'll swap to a `roles` table.
-- Real notifications to staff on role change beyond the invite/reset password emails Supabase sends automatically.
-
----
-
-Reply **go** to build it, or tell me what to change (e.g. "use a dynamic roles table instead of enum", "keep old Staff page", "skip activity drawer for v1").
+## External prerequisites
+Saved tokens are present for both accounts, but this does not confirm messaging permissions or webhook subscriptions. Live arrival may require an administrator to configure the callback and enable approved messaging/comment permissions in Meta. The app will distinguish configured, blocked and verified delivery states.
