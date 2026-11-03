@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { format } from "date-fns";
 import { Facebook, Instagram, MessageSquare, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +32,8 @@ export default function SocialInbox() {
   const [filter, setFilter] = useState<"all" | "message" | "comment">("all");
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
+  const activeRef = useRef<string | undefined>();
+  activeRef.current = active?.id;
 
   const loadConvs = async () => {
     const { data } = await db.from("social_conversations").select("*").order("last_event_at", { ascending: false }).limit(200);
@@ -47,12 +49,11 @@ export default function SocialInbox() {
     const ch = supabase.channel(`social-inbox-${Math.random().toString(36).slice(2)}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "social_conversations" }, () => loadConvs())
       .on("postgres_changes", { event: "*", schema: "public", table: "social_messages" }, (p: any) => {
-        if (p.new?.conversation_id && p.new.conversation_id === activeRef.id) loadMsgs(activeRef.id);
+        if (p.new?.conversation_id && p.new.conversation_id === activeRef.current) loadMsgs(activeRef.current);
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
   }, []);
-  const activeRef = { id: active?.id };
 
   const open = async (c: Conv) => {
     setActive(c); setText(""); loadMsgs(c.id);

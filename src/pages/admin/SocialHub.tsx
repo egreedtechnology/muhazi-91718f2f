@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Facebook, Instagram, Linkedin, MessageCircle, Twitter, Music2, Inbox, PenSquare, CalendarDays, Plug, Activity, LayoutGrid } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SocialInbox from "@/components/admin/SocialInbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -111,7 +112,8 @@ const SocialHub = () => {
     const list = ((data as any[]) ?? []) as Conn[];
     setConns(list.sort((a, b) => ORDER.indexOf(a.platform) - ORDER.indexOf(b.platform)));
     const { data: l } = await supabase.from("activity_logs").select("*").or("action.ilike.%instagram%,action.ilike.%social%").order("created_at", { ascending: false }).limit(50);
-    setLogs(l ?? []);
+    const { data: s } = await (supabase as any).from("social_activity").select("*").order("created_at", { ascending: false }).limit(100);
+    setLogs([...(l ?? []), ...((s as any[]) ?? []).map((x) => ({ ...x, action: `${x.platform ?? "social"} · ${x.action}` }))].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 100));
   };
   const { toast } = useToast();
   const [connecting, setConnecting] = useState(false);
@@ -175,7 +177,7 @@ const SocialHub = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="inbox"><Soon icon={Inbox} title="Unified inbox — next phase" text="Facebook, Instagram and WhatsApp messages will appear here once the Meta webhook is linked." /></TabsContent>
+          <TabsContent value="inbox"><SocialInbox /></TabsContent>
           <TabsContent value="create"><Soon icon={PenSquare} title="Post composer — next phase" text="For now, use Blog → Social captions to write and post articles to each network." /></TabsContent>
           <TabsContent value="calendar"><Soon icon={CalendarDays} title="Content calendar — next phase" text="Scheduled social posts will show here." /></TabsContent>
 
