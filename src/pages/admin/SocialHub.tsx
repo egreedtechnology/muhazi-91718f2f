@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { Facebook, Instagram, Linkedin, MessageCircle, Twitter, Music2, Inbox, PenSquare, CalendarDays, Plug, Activity, LayoutGrid } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PostComposer from "@/components/admin/PostComposer";
 import SocialInbox from "@/components/admin/SocialInbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -178,7 +179,7 @@ const SocialHub = () => {
           </TabsContent>
 
           <TabsContent value="inbox"><SocialInbox /></TabsContent>
-          <TabsContent value="create"><Soon icon={PenSquare} title="Post composer — next phase" text="For now, use Blog → Social captions to write and post articles to each network." /></TabsContent>
+          <TabsContent value="create"><PostComposer onPublished={load} /></TabsContent>
           <TabsContent value="calendar"><Soon icon={CalendarDays} title="Content calendar — next phase" text="Scheduled social posts will show here." /></TabsContent>
 
           <TabsContent value="connections" className="space-y-4">
