@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Megaphone, ClipboardCopy, Square, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { uploadSocialPhoto } from "@/lib/socialPhoto";
 
 interface Props {
   open: boolean;
@@ -26,6 +27,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [igBusy, setIgBusy] = useState(false);
+  const [publishedLinks, setPublishedLinks] = useState<Record<string, string>>({});
   const abortRef = useRef<AbortController | null>(null);
 
   const generate = async () => {
@@ -91,38 +93,37 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
     const u = encodeURIComponent(articleUrl);
     const t = encodeURIComponent(c.text);
     let url = "";
-    if (name.includes("facebook")) {
-      url = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
-      await navigator.clipboard.writeText(c.text).catch(() => {});
-      toast({ title: "Caption copied", description: "Paste it into the Facebook post box." });
+    if (name.includes("facebook") || name.includes("instagram")) {
+      if (!post || igBusy) return;
+      const platform = name.includes('facebook') ? 'facebook' : 'instagram';
+      setIgBusy(true);
+      try {
+        let image_url = '';
+        if (platform === 'instagram') {
+          if (!post.cover_image_url) throw new Error('Add a cover photo to this article first.');
+          const response = await fetch(post.cover_image_url);
+          if (!response.ok || !response.headers.get('content-type')?.startsWith('image/')) throw new Error('The cover must be a photo, not a link to an Instagram post.');
+          image_url = await uploadSocialPhoto(await response.blob());
+        }
+        const { data, error } = await supabase.functions.invoke('social-post', { body: { postId: post.id, caption: c.text, image_url, platforms: [platform] } });
+        if (error) {
+          const detail = await (error as any).context?.json?.().catch(() => null);
+          throw new Error(detail?.error || error.message);
+        }
+        const result = data?.results?.[platform];
+        if (!result?.ok) throw new Error(result?.error || data?.error || 'Publishing failed');
+        setPublishedLinks(previous => ({ ...previous, [platform]: result.url || '' }));
+        toast({ title: `Posted to ${c.platform}`, description: 'The article caption is now published.' });
+      } catch (e) {
+        toast({ title: `${c.platform} post failed`, description: e instanceof Error ? e.message : 'Publishing failed', variant: 'destructive' });
+      } finally { setIgBusy(false); }
+      return;
     } else if (name.includes("linkedin")) {
       url = `https://www.linkedin.com/feed/?shareActive=true&text=${t}`;
     } else if (name === "x" || name.includes("twitter")) {
       url = `https://x.com/intent/post?text=${t}`;
     } else if (name.includes("whatsapp")) {
       url = `https://wa.me/?text=${t}`;
-    } else if (name.includes("instagram")) {
-      if (!post) return;
-      if (!post.cover_image_url) {
-        toast({ title: "Cover image needed", description: "Add a cover image to this article first.", variant: "destructive" });
-        return;
-      }
-      setIgBusy(true);
-      try {
-        const { data, error } = await supabase.functions.invoke("instagram-post", { body: { postId: post.id, caption: c.text } });
-        if (error) {
-          const j = await (error as any).context?.json?.().catch(() => null);
-          throw new Error(j?.error || error.message);
-        }
-        if (data?.error) throw new Error(data.error);
-        toast({ title: "Posted to Instagram", description: "The cover photo and caption are now live." });
-        if (data?.permalink) openTab(data.permalink);
-      } catch (e: any) {
-        toast({ title: "Instagram post failed", description: e.message, variant: "destructive" });
-      } finally {
-        setIgBusy(false);
-      }
-      return;
     }
     if (url) openTab(url);
   };
@@ -149,7 +150,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
         <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
           <div>
             <Label>Published article</Label>
-            <Select value={postId} onValueChange={setPostId}>
+            <Select disabled={igBusy} value={postId} onValueChange={(value) => { setPostId(value); setCaptions([]); setPublishedLinks({}); }}>
               <SelectTrigger><SelectValue placeholder={published.length ? "Choose an article" : "No published articles yet"} /></SelectTrigger>
               <SelectContent>
                 {published.map((p) => <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>)}
@@ -170,7 +171,7 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
         </div>
 
         <div className="flex gap-2">
-          <Button onClick={generate} disabled={!postId || busy}>
+          <Button onClick={generate} disabled={!postId || busy || igBusy}>
             {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Megaphone className="w-4 h-4 mr-2" />}
             {busy ? "Writing captions…" : captions.length ? "Regenerate" : "Generate captions"}
           </Button>
@@ -183,14 +184,15 @@ export default function SocialCaptionsDialog({ open, onOpenChange, posts }: Prop
           {captions.map((c, i) => (
             <Card key={i}>
               <CardContent className="p-3 space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-2 items-center justify-between">
                   <Badge variant="secondary">{c.platform}</Badge>
                   <div className="flex gap-1">
                     <Button size="sm" variant="ghost" onClick={() => copy(c.text)}><ClipboardCopy className="w-3 h-3 mr-1" />Copy</Button>
-                    <Button size="sm" disabled={igBusy && c.platform.toLowerCase().includes("instagram")} onClick={() => share(c)}>{igBusy && c.platform.toLowerCase().includes("instagram") ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}Post to {c.platform}</Button>
+                    <Button size="sm" disabled={igBusy || Object.prototype.hasOwnProperty.call(publishedLinks, c.platform.toLowerCase())} onClick={() => share(c)}>{igBusy ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Share2 className="w-3 h-3 mr-1" />}Post to {c.platform}</Button>
                   </div>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{c.text}</p>
+                {publishedLinks[c.platform.toLowerCase()] && <a className="text-sm text-primary underline" href={publishedLinks[c.platform.toLowerCase()]} target="_blank" rel="noreferrer">View on {c.platform}</a>}
               </CardContent>
             </Card>
           ))}

@@ -1,3 +1,4 @@
 - Blog AI features call the Lovable AI Gateway from staff-only edge functions; captions stream via Responses SSE parsed in the browser — keeps the key server-side.
 - Social Hub stores conversations separately from clinical records; only server actions write messages and audit events, and private-schema RLS guards restrict reads to nonsuspended Social Hub roles.
 - Meta webhook signatures are verified over raw bytes; provider IDs deduplicate deliveries, and server-side account tokens never reach the browser.
+- Social photo uploads are converted to JPEG for Meta compatibility; Blog direct publishing validates the selected published article server-side and uses the Social Hub authorization policy.

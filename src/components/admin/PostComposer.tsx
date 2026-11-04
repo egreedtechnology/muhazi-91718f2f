@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { uploadSocialPhoto } from "@/lib/socialPhoto";
 import { Facebook, Instagram, ImagePlus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,24 +17,23 @@ export default function PostComposer({ onPublished }: { onPublished?: () => void
   const [ig, setIg] = useState(true);
   const [busy, setBusy] = useState(false);
   const [links, setLinks] = useState<Record<string, string>>({});
+  const [published, setPublished] = useState<string[]>([]);
+  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
 
   const pick = (f: File | null) => {
     if (f && !["image/jpeg", "image/png"].includes(f.type)) return toast({ title: "Use a JPG or PNG photo", variant: "destructive" });
     if (f && f.size > 8 * 1024 * 1024) return toast({ title: "Photo must be under 8MB", variant: "destructive" });
-    setFile(f); setPreview(f ? URL.createObjectURL(f) : null);
+    setFile(f); setPreview(f ? URL.createObjectURL(f) : null); setPublished([]);
   };
 
   const publish = async () => {
-    setBusy(true); setLinks({});
+    setBusy(true);
     try {
       let image_url = "";
       if (file) {
-        const path = `social/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${file.type === "image/png" ? "png" : "jpg"}`;
-        const { error } = await supabase.storage.from("gallery").upload(path, file, { contentType: file.type, upsert: false });
-        if (error) throw error;
-        image_url = supabase.storage.from("gallery").getPublicUrl(path).data.publicUrl;
+        image_url = await uploadSocialPhoto(file);
       }
-      const platforms = [fb && "facebook", ig && "instagram"].filter(Boolean);
+      const platforms = [fb && "facebook", ig && "instagram"].filter((p): p is string => typeof p === 'string' && !published.includes(p));
       const { data, error } = await supabase.functions.invoke("social-post", { body: { caption, image_url, platforms } });
       if (error) {
         let msg = error.message;
@@ -46,10 +45,12 @@ export default function PostComposer({ onPublished }: { onPublished?: () => void
         if (r.ok) ok[p] = r.url ?? "";
         else toast({ title: `${p} failed`, description: r.error, variant: "destructive" });
       }
-      setLinks(ok);
+      setLinks(previous => ({ ...previous, ...ok }));
+      setPublished(previous => [...new Set([...previous, ...Object.keys(ok)])]);
       if (Object.keys(ok).length) {
         toast({ title: "Published", description: `Live on ${Object.keys(ok).join(" and ")}.` });
-        setCaption(""); pick(null); onPublished?.();
+        if (Object.keys(ok).length === platforms.length) { setCaption(""); setFile(null); setPreview(null); }
+        onPublished?.();
       }
     } catch (e) {
       toast({ title: "Could not publish", description: (e as Error).message, variant: "destructive" });
@@ -57,19 +58,19 @@ export default function PostComposer({ onPublished }: { onPublished?: () => void
     setBusy(false);
   };
 
-  const canPost = caption.trim() && (fb || ig) && (!ig || file) && !busy;
+  const canPost = caption.trim() && ((fb && !published.includes('facebook')) || (ig && !published.includes('instagram'))) && (!ig || published.includes('instagram') || file) && !busy;
 
   return (
-    <Card><CardContent className="pt-6 space-y-4">
+    <div className="space-y-4 py-4">
       <div>
-        <Label>Caption</Label>
-        <Textarea rows={6} maxLength={2200} value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Write something for your patients…" />
+        <Label htmlFor="social-caption">Caption</Label>
+        <Textarea id="social-caption" disabled={busy} rows={6} maxLength={2200} value={caption} onChange={(e) => { setCaption(e.target.value); setPublished([]); }} placeholder="Write something for your patients…" />
         <p className="text-xs text-muted-foreground text-right">{caption.length}/2200</p>
       </div>
       {preview ? (
         <div className="relative w-48">
           <img src={preview} alt="Post photo preview" className="rounded-md w-48 h-48 object-cover" />
-          <Button size="icon" variant="secondary" className="absolute top-1 right-1 h-7 w-7" onClick={() => pick(null)}><X className="w-4 h-4" /></Button>
+          <Button aria-label="Remove photo" disabled={busy} size="icon" variant="secondary" className="absolute top-1 right-1 h-7 w-7" onClick={() => pick(null)}><X className="w-4 h-4" /></Button>
         </div>
       ) : (
         <label className="flex items-center gap-2 border border-dashed rounded-md p-4 cursor-pointer text-sm text-muted-foreground hover:bg-muted w-fit">
@@ -86,6 +87,6 @@ export default function PostComposer({ onPublished }: { onPublished?: () => void
       {Object.entries(links).map(([p, url]) => url && (
         <a key={p} href={url} target="_blank" rel="noreferrer" className="block text-sm text-primary underline capitalize">View on {p}</a>
       ))}
-    </CardContent></Card>
+    </div>
   );
 }

@@ -1,11 +1,9 @@
 // Publishes a published blog article's cover image + caption to the clinic's
 // Instagram Business account via the Instagram Graph API. Staff-only.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { waitForInstagram } from '../_shared/social-publishing.ts';
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 const GRAPH = "https://graph.facebook.com/v21.0";
 
 function json(payload: unknown, status = 200) {
@@ -31,7 +29,10 @@ Deno.serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) return json({ error: "Not authenticated" }, 401);
-    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    const url = Deno.env.get('SUPABASE_URL');
+    const anon = Deno.env.get('SUPABASE_ANON_KEY');
+    if (!url || !anon) throw new Error('Publishing is not configured');
+    const supabase = createClient(url, anon, {
       global: { headers: { Authorization: authHeader } },
     });
     const { data: u, error: uErr } = await supabase.auth.getUser();
@@ -53,8 +54,11 @@ Deno.serve(async (req) => {
     let token = Deno.env.get("INSTAGRAM_ACCESS_TOKEN");
     let igUser = Deno.env.get("INSTAGRAM_USER_ID");
     if (!token || !igUser) {
-      const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-      const { data: t } = await admin.from("social_tokens").select("access_token, external_id").eq("platform", "instagram").maybeSingle();
+      const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      if (!serviceKey) throw new Error('Publishing is not configured');
+      const admin = createClient(url, serviceKey);
+      const { data: t, error: tokenError } = await admin.from("social_tokens").select("access_token, external_id").eq("platform", "instagram").maybeSingle();
+      if (tokenError) throw new Error('Could not check the Instagram connection');
       token = t?.access_token; igUser = t?.external_id ?? undefined;
     }
     if (!token || !igUser) return json({ error: "Instagram is not connected yet — use Social Hub → Connect with Meta" }, 500);
@@ -62,12 +66,10 @@ Deno.serve(async (req) => {
     // 1) create media container
     const container = await graph(`${igUser}/media`, { image_url: post.cover_image_url, caption, access_token: token });
     // 2) wait until Instagram has fetched the image
-    for (let i = 0; i < 15; i++) {
+    await waitForInstagram(async () => {
       const s = await graph(container.id, { fields: "status_code", access_token: token }, "GET");
-      if (s.status_code === "FINISHED") break;
-      if (s.status_code === "ERROR") throw new Error("Instagram could not process the cover image (use JPG, under 8MB).");
-      await new Promise((r) => setTimeout(r, 2000));
-    }
+      return s.status_code;
+    });
     // 3) publish
     const published = await graph(`${igUser}/media_publish`, { creation_id: container.id, access_token: token });
     const info = await graph(published.id, { fields: "permalink", access_token: token }, "GET").catch(() => ({}));
