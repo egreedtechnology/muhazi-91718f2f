@@ -20,3 +20,11 @@ export async function uploadSocialPhoto(file: Blob): Promise<string> {
     return supabase.storage.from('gallery').getPublicUrl(path).data.publicUrl;
   } finally { bitmap.close(); }
 }
+/** Uploads an MP4/MOV video as-is for Facebook and Instagram Reels; returns its public URL. */
+export async function uploadSocialVideo(file: File): Promise<string> {
+  const ext = file.type === 'video/quicktime' ? 'mov' : 'mp4';
+  const path = `social/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from('gallery').upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw new Error(`Video upload failed: ${error.message}`);
+  return supabase.storage.from('gallery').getPublicUrl(path).data.publicUrl;
+}

@@ -1,11 +1,11 @@
-export async function waitForInstagram(check: () => Promise<string>, pause = () => new Promise<void>(resolve => setTimeout(resolve, 2000))) {
-  for (let attempt = 0; attempt < 15; attempt++) {
+export async function waitForInstagram(check: () => Promise<string>, pause = () => new Promise<void>(resolve => setTimeout(resolve, 2000)), attempts = 15) {
+  for (let attempt = 0; attempt < attempts; attempt++) {
     const status = await check();
     if (status === 'FINISHED') return;
-    if (status === 'ERROR' || status === 'EXPIRED') throw new Error('Instagram could not process the photo. Upload a JPG photo and try again.');
-    if (attempt < 14) await pause();
+    if (status === 'ERROR' || status === 'EXPIRED') throw new Error('Instagram could not process the media. Use a JPG photo or an MP4 video and try again.');
+    if (attempt < attempts - 1) await pause();
   }
-  throw new Error('Instagram is still processing the photo. Nothing was published to Instagram.');
+  throw new Error('Instagram is still processing the media. Nothing was published to Instagram.');
 }
 
 export function publishingInput(body: any) {

@@ -1341,6 +1341,51 @@ export type Database = {
           },
         ]
       }
+      social_scheduled_posts: {
+        Row: {
+          caption: string
+          created_at: string
+          created_by: string | null
+          id: string
+          media_type: string
+          media_url: string | null
+          platforms: string[]
+          published_at: string | null
+          results: Json
+          scheduled_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string | null
+          platforms: string[]
+          published_at?: string | null
+          results?: Json
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string | null
+          platforms?: string[]
+          published_at?: string | null
+          results?: Json
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       social_tokens: {
         Row: {
           access_token: string
