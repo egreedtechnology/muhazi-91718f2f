@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DOMPurify from "dompurify";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,14 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
   const [withImage, setWithImage] = useState(true);
   const [images, setImages] = useState<Record<number, { src: string; final: boolean }>>({});
   const [imaging, setImaging] = useState<number | null>(null);
+  const [services, setServices] = useState<{ id: string; name: string; description: string | null }[]>([]);
+  const [serviceId, setServiceId] = useState("any");
+
+  useEffect(() => {
+    if (!open) return;
+    supabase.from("services").select("id,name,description").eq("is_active", true).order("name")
+      .then(({ data }) => setServices(data || []));
+  }, [open]);
 
   const makeImage = async (i: number, signal: AbortSignal): Promise<string | null> => {
     if (images[i]?.final) return images[i].src;
@@ -70,7 +79,10 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
     setLoadingIdeas(true); setError(null); setIdeas([]); setArticles({}); setImages({}); setDone({}); setPreview(null);
     const ctrl = new AbortController(); abortRef.current = ctrl;
     try {
-      const r = await streamAiJson<{ ideas: Idea[] }>("blog-trending", { mode: "ideas" }, ctrl.signal);
+      const svc = services.find((s) => s.id === serviceId);
+      const r = await streamAiJson<{ ideas: Idea[] }>("blog-trending", {
+        mode: "ideas", ...(svc ? { service: svc.name, service_description: svc.description ?? "" } : {}),
+      }, ctrl.signal);
       setIdeas(r.ideas || []);
     } catch (e: any) {
       if (e?.name !== "AbortError") setError(e.message);
@@ -155,6 +167,17 @@ export default function TrendingPostsDialog({ open, onOpenChange, onCreated }: P
             Get topic ideas patients are likely searching for now, then write and publish a full article in one click.
           </DialogDescription>
         </DialogHeader>
+
+        <div className="grid gap-1.5 max-w-sm">
+          <Label className="text-sm">Write about a service</Label>
+          <Select value={serviceId} onValueChange={setServiceId} disabled={busy}>
+            <SelectTrigger><SelectValue placeholder="Any trending topic" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any trending topic</SelectItem>
+              {services.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
 
         <Button onClick={suggest} disabled={busy} className="w-fit">
           {loadingIdeas ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <TrendingUp className="w-4 h-4 mr-2" />}

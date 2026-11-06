@@ -126,7 +126,12 @@ Warm, clean, professional, natural light, friendly East African patients or dent
       const { data: existing } = await supabase.from("blog_posts").select("title").limit(200);
       const titles = (existing || []).map((p: { title: string }) => `- ${p.title}`).join("\n");
       const month = new Date().toLocaleString("en-GB", { month: "long", year: "numeric" });
-      userPrompt = `Current month: ${month}.
+      const service = str(body?.service, 120);
+      const serviceDesc = str(body?.service_description, 400);
+      const focus = service
+        ? `\nEvery idea MUST be about this clinic service: "${service}"${serviceDesc ? ` (${serviceDesc})` : ""}. Cover different patient questions about it.`
+        : "";
+      userPrompt = `Current month: ${month}.${focus}
 Suggest 5 dental blog posts that patients in Rwanda and East Africa are likely searching for right now (seasonal concerns, common questions, school terms, holidays, widely discussed oral-health topics). Each must have a clear patient benefit and an SEO focus keyword.
 Do not repeat or closely overlap these existing articles:
 ${titles || "(none yet)"}`;
