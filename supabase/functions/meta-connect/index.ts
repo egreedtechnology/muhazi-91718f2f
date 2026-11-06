@@ -10,9 +10,10 @@ const corsHeaders = {
 };
 const GRAPH = "https://graph.facebook.com/v21.0";
 const SCOPES = [
-  "pages_show_list", "pages_read_engagement", "pages_manage_posts", "pages_messaging",
-  "instagram_basic", "instagram_content_publish", "instagram_manage_messages", "instagram_manage_comments",
-  "business_management", "whatsapp_business_management", "whatsapp_business_messaging",
+  // Only scopes enabled in the Meta app's Use Cases; others cause "Invalid Scopes".
+  "pages_show_list", "pages_read_engagement", "pages_messaging",
+  "instagram_basic", "instagram_content_publish", "instagram_manage_comments",
+  "business_management",
 ].join(",");
 const ALLOWED_ORIGIN = /^https:\/\/([a-z0-9-]+\.)*(lovable\.app|lovableproject\.com|muhazidentalclinic\.org)$|^http:\/\/localhost(:\d+)?$/;
 
