@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Facebook, Instagram, Linkedin, MessageCircle, Twitter, Music2, Inbox, PenSquare, CalendarDays, Plug, Activity, LayoutGrid } from "lucide-react";
+import { Facebook, Instagram, Linkedin, MessageCircle, Twitter, Music2, Inbox, PenSquare, CalendarDays, Plug, Activity, LayoutGrid, Newspaper } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PostComposer from "@/components/admin/PostComposer";
 import SocialInbox from "@/components/admin/SocialInbox";
+import SocialFeed from "@/components/admin/SocialFeed";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -156,6 +157,7 @@ const SocialHub = () => {
         <Tabs defaultValue={metaResult ? "connections" : "overview"}>
           <TabsList className="flex-wrap h-auto">
             <TabsTrigger value="overview"><LayoutGrid className="w-4 h-4 mr-1" />Overview</TabsTrigger>
+            <TabsTrigger value="posts"><Newspaper className="w-4 h-4 mr-1" />Recent posts</TabsTrigger>
             <TabsTrigger value="inbox"><Inbox className="w-4 h-4 mr-1" />Inbox</TabsTrigger>
             <TabsTrigger value="create"><PenSquare className="w-4 h-4 mr-1" />Create post</TabsTrigger>
             <TabsTrigger value="calendar"><CalendarDays className="w-4 h-4 mr-1" />Calendar</TabsTrigger>
@@ -179,6 +181,7 @@ const SocialHub = () => {
           </TabsContent>
 
           <TabsContent value="inbox"><SocialInbox /></TabsContent>
+          <TabsContent value="posts"><SocialFeed /></TabsContent>
           <TabsContent value="create"><PostComposer onPublished={load} /></TabsContent>
           <TabsContent value="calendar"><Soon icon={CalendarDays} title="Content calendar — next phase" text="Scheduled social posts will show here." /></TabsContent>
 
